@@ -1,0 +1,83 @@
+/* Disable all tooltips and tooltip-like functionality across the website */
+
+/* Hide tooltip elements */
+.tooltip,
+.bs-tooltip-top,
+.bs-tooltip-bottom,
+.bs-tooltip-left,
+.bs-tooltip-right,
+.bs-tooltip-auto,
+.noUi-tooltip {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* Remove any hover effects that might trigger tooltips */
+[data-bs-toggle="tooltip"],
+[data-toggle="tooltip"],
+[data-tooltip],
+[title]:hover,
+[data-original-title] {
+    cursor: default !important;
+}
+
+/* Hide any elements that might be used as tooltips */
+.tooltip-inner,
+.tooltip-arrow,
+.popover,
+.bs-popover-top,
+.bs-popover-bottom,
+.bs-popover-left,
+.bs-popover-right,
+.bs-popover-auto {
+    display: none !important;
+    visibility: hidden !important;
+}
+
+/* Prevent any tooltip-related animations */
+.fade.tooltip,
+.fade.popover {
+    transition: none !important;
+    animation: none !important;
+}
+
+/* Remove any CSS that might create tooltip-like hover effects */
+[title] {
+    position: relative;
+}
+
+[title]:before,
+[title]:after {
+    display: none !important;
+    content: none !important;
+}
+
+/* Specifically target noUISlider tooltips */
+.noUi-handle .noUi-tooltip {
+    display: none !important;
+}
+
+.noUi-tooltip {
+    display: none !important;
+    visibility: hidden !important;
+}
+
+/* Override any custom tooltip implementations */
+.custom-tooltip,
+.info-tooltip,
+.help-tooltip {
+    display: none !important;
+}
+
+/* Prevent title attribute hover behavior */
+[title] {
+    pointer-events: auto;
+}
+
+/* Make sure no pseudo-elements create tooltip-like behavior */
+*:hover:before,
+*:hover:after {
+    content: none !important;
+}

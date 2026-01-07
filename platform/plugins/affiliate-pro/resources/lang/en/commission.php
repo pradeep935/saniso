@@ -1,0 +1,53 @@
+<?php
+
+return [
+    'name' => 'Commissions',
+    'view' => 'View Commission #:id',
+    'affiliate' => 'Affiliate',
+    'order' => 'Order',
+    'amount' => 'Amount',
+    'description' => 'Description',
+    'status' => 'Status',
+    'created_at' => 'Created At',
+    'approve' => 'Approve',
+    'reject' => 'Reject',
+    'approve_success' => 'Commission approved successfully',
+    'reject_success' => 'Commission rejected successfully',
+    'approve_commission' => 'Approve Commission',
+    'reject_commission' => 'Reject Commission',
+    'approve_commission_confirmation' => 'Are you sure you want to approve commission #:id? This action cannot be undone.',
+    'reject_commission_confirmation' => 'Are you sure you want to reject commission #:id? This action cannot be undone.',
+    'statuses' => [
+        'pending' => 'Pending',
+        'approved' => 'Approved',
+        'rejected' => 'Rejected',
+    ],
+
+    // Customer-facing translations
+    'history' => 'Commission History',
+    'no_commissions' => 'No commissions found.',
+    'no_commissions_description' => 'You haven\'t earned any commissions yet. Start promoting our products to earn your first commission!',
+    'commission_id' => 'Commission ID',
+    'order_id' => 'Order ID',
+    'customer' => 'Customer',
+    'product' => 'Product',
+    'type' => 'Type',
+    'date' => 'Date',
+
+    // New UI translations
+    'total_commissions' => ':count Total Commissions',
+    'filter_by_status' => 'Filter by Status',
+    'all_statuses' => 'All Statuses',
+    'date_from' => 'Date From',
+    'date_to' => 'Date To',
+    'filter' => 'Filter',
+    'clear' => 'Clear',
+    'approved_earnings' => 'Approved Earnings',
+    'pending_earnings' => 'Pending Earnings',
+    'successful_orders' => 'Successful Orders',
+    'approval_rate' => 'Approval Rate',
+    'commission_earned' => 'Commission Earned',
+    'showing_results' => 'Showing :from to :to of :total results',
+    'start_promoting' => 'Start Promoting',
+    'back_to_dashboard' => 'Back to Dashboard',
+];

@@ -1,0 +1,53 @@
+<?php
+
+return [
+    'name' => 'Hoa hồng',
+    'view' => 'Xem hoa hồng #:id',
+    'affiliate' => 'Đối tác liên kết',
+    'order' => 'Đơn hàng',
+    'amount' => 'Số tiền',
+    'description' => 'Mô tả',
+    'status' => 'Trạng thái',
+    'created_at' => 'Tạo lúc',
+    'approve' => 'Phê duyệt',
+    'reject' => 'Từ chối',
+    'approve_success' => 'Hoa hồng đã được phê duyệt thành công',
+    'reject_success' => 'Hoa hồng đã bị từ chối thành công',
+    'approve_commission' => 'Phê duyệt hoa hồng',
+    'reject_commission' => 'Từ chối hoa hồng',
+    'approve_commission_confirmation' => 'Bạn có chắc chắn muốn phê duyệt hoa hồng #:id không? Hành động này không thể hoàn tác.',
+    'reject_commission_confirmation' => 'Bạn có chắc chắn muốn từ chối hoa hồng #:id không? Hành động này không thể hoàn tác.',
+    'statuses' => [
+        'pending' => 'Đang chờ xử lý',
+        'approved' => 'Đã phê duyệt',
+        'rejected' => 'Đã từ chối',
+    ],
+
+    // Customer-facing translations
+    'history' => 'Lịch sử hoa hồng',
+    'no_commissions' => 'Không tìm thấy hoa hồng nào.',
+    'no_commissions_description' => 'Bạn chưa kiếm được hoa hồng nào. Hãy bắt đầu quảng bá sản phẩm của chúng tôi để kiếm hoa hồng đầu tiên!',
+    'commission_id' => 'Mã hoa hồng',
+    'order_id' => 'Mã đơn hàng',
+    'customer' => 'Khách hàng',
+    'product' => 'Sản phẩm',
+    'type' => 'Loại',
+    'date' => 'Ngày',
+
+    // New UI translations
+    'total_commissions' => ':count Tổng hoa hồng',
+    'filter_by_status' => 'Lọc theo trạng thái',
+    'all_statuses' => 'Tất cả trạng thái',
+    'date_from' => 'Từ ngày',
+    'date_to' => 'Đến ngày',
+    'filter' => 'Lọc',
+    'clear' => 'Xóa',
+    'approved_earnings' => 'Thu nhập đã duyệt',
+    'pending_earnings' => 'Thu nhập chờ duyệt',
+    'successful_orders' => 'Đơn hàng thành công',
+    'approval_rate' => 'Tỷ lệ phê duyệt',
+    'commission_earned' => 'Hoa hồng kiếm được',
+    'showing_results' => 'Hiển thị :from đến :to trong tổng số :total kết quả',
+    'start_promoting' => 'Bắt đầu quảng bá',
+    'back_to_dashboard' => 'Quay lại bảng điều khiển',
+];

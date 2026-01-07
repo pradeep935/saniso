@@ -1,0 +1,73 @@
+<?php
+
+return [
+    'name' => 'Reports',
+    'commission_this_month' => 'Commission this month',
+    'pending_commissions' => 'Pending commissions',
+    'approved_commissions' => 'Approved commissions',
+    'pending_withdrawals' => 'Pending withdrawals',
+    'approved_withdrawals' => 'Approved withdrawals',
+    'active_affiliates' => 'Active affiliates',
+    'affiliate_stats' => 'Affiliate Statistics',
+    'top_affiliates' => 'Top Affiliates',
+    'recent_commissions' => 'Recent Commissions',
+    'recent_withdrawals' => 'Recent Withdrawals',
+    'commission_chart' => 'Commission Chart',
+    'withdrawal_chart' => 'Withdrawal Chart',
+
+    // Enhanced reports
+    'geographic_data' => 'Geographic Data',
+    'top_countries' => 'Top Countries',
+    'top_cities' => 'Top Cities',
+    'short_link_performance' => 'Short Link Performance',
+    'top_performing_links' => 'Top Performing Links',
+    'link' => 'Link',
+    'clicks' => 'Clicks',
+    'conversions' => 'Conversions',
+    'commission_trends' => 'Commission Trends',
+    'commission_amount' => 'Commission Amount',
+    'loading' => 'Loading...',
+    'no_data' => 'No data available',
+    'no_commission_data' => 'No commission data available for the selected period',
+    'no_geographic_data' => 'No geographic data available for the selected period',
+    'no_city_data' => 'No city data available for the selected country',
+    'chart_error' => 'Error rendering chart. Please try refreshing the page.',
+
+    // Performance metrics widget
+    'performance_metrics' => 'Performance Metrics',
+    'total_clicks' => 'Total Clicks',
+    'earnings' => 'Earnings',
+    'avg_commission' => 'Avg. Commission',
+    'avg_conversion_rate' => 'Avg. Conversion Rate',
+    'vs_previous' => 'vs previous',
+    'no_change' => 'No change',
+    'performance_over_time' => 'Performance Over Time',
+    'clicks_conversions' => 'Clicks & Conversions',
+
+    // Conversion rate widget
+    'conversion_rate_analysis' => 'Conversion Rate Analysis',
+    'overall_conversion_rate' => 'Overall Conversion Rate',
+    'conversion_breakdown' => 'Conversion Breakdown',
+    'source' => 'Source',
+    'rate' => 'Rate',
+    'conversion_rate_percentage' => 'Conversion Rate (%)',
+    'optimization_opportunity' => 'Optimization Opportunity',
+    'conversion_rate_below_average' => 'Your conversion rate is below average. Consider these tips:',
+    'target_relevant_audiences' => 'Target more relevant audiences',
+    'improve_promotional_content' => 'Improve your promotional content',
+    'focus_higher_conversion_products' => 'Focus on products with higher conversion rates',
+    'great_performance' => 'Great Performance!',
+    'excellent_conversion_rate' => 'Your conversion rate is excellent. Keep up the good work!',
+    'good_performance' => 'Good Performance',
+    'average_conversion_rate' => 'Your conversion rate is within the average range. There\'s room for improvement.',
+
+    // Date ranges (copied from ecommerce for consistency)
+    'ranges' => [
+        'today' => 'Today',
+        'this_week' => 'This week',
+        'last_7_days' => 'Last 7 days',
+        'last_30_days' => 'Last 30 days',
+        'this_month' => 'This month',
+        'this_year' => 'This year',
+    ],
+];

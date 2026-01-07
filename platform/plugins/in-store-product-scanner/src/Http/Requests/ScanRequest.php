@@ -1,0 +1,27 @@
+<?php
+
+namespace Platform\InStoreProductScanner\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class ScanRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    public function rules(): array
+    {
+        return [
+            'code' => 'required|string|max:255',
+        ];
+    }
+
+    public function filters(): array
+    {
+        return [
+            'code' => 'trim|escape',
+        ];
+    }
+}

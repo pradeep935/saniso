@@ -1,0 +1,390 @@
+// Affiliate Pro Styles
+
+// Variables
+$breakpoint-xs: 480px;
+$breakpoint-sm: 576px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 992px;
+$breakpoint-xl: 1200px;
+
+// Mixins
+@mixin mobile {
+    @media (max-width: #{$breakpoint-md - 1px}) {
+        @content;
+    }
+}
+
+@mixin tablet {
+    @media (min-width: #{$breakpoint-md}) and (max-width: #{$breakpoint-lg - 1px}) {
+        @content;
+    }
+}
+
+@mixin desktop {
+    @media (min-width: #{$breakpoint-lg}) {
+        @content;
+    }
+}
+
+// Stats Widget Parent
+#affiliate-stats-widget-widget-parent {
+    width: 100%;
+    display: block;
+    clear: both;
+    margin-bottom: 2rem;
+
+    .position-relative {
+        min-height: 200px;
+    }
+
+    #affiliate-stats-widget-widget {
+        bottom: 0;
+        left: 0;
+        width: 100%;
+    }
+}
+
+.affiliate-stats-widget-parent {
+    margin-top: 1rem;
+
+    .card {
+        transition: all 0.2s ease-in-out;
+
+        &:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        .avatar-lg {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .fs-4 {
+            font-size: 1.5rem !important;
+        }
+
+        .text-secondary {
+            font-size: 0.95rem;
+        }
+    }
+}
+
+.affiliate-dashboard {
+    .card {
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+
+        &:hover {
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+    }
+
+    .stats-card {
+        background-color: #fff;
+        border-left: 4px solid #5cb85c;
+        margin-bottom: 20px;
+
+        &.stats-commission {
+            border-left-color: #5bc0de;
+        }
+
+        &.stats-withdrawal {
+            border-left-color: #f0ad4e;
+        }
+
+        &.stats-clicks {
+            border-left-color: #d9534f;
+        }
+
+        .stats-card-title {
+            color: #777;
+            font-size: 13px;
+            text-transform: uppercase;
+        }
+
+        .stats-card-value {
+            color: #333;
+            font-size: 24px;
+            font-weight: 600;
+        }
+    }
+
+    .affiliate-link-box {
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+        margin-bottom: 20px;
+        padding: 15px;
+
+        .affiliate-link {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            font-family: monospace;
+            margin-top: 10px;
+            padding: 8px 12px;
+            word-break: break-all;
+        }
+
+        .copy-button {
+            margin-top: 10px;
+        }
+    }
+
+    .commission-table, .withdrawal-table {
+        th {
+            background-color: #f5f5f5;
+        }
+    }
+}
+
+// Report tables styling
+.table-report-table {
+    width: 100%;
+    margin-bottom: 0;
+
+    thead {
+        th {
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            font-weight: 600;
+            color: #333;
+            padding: 0.75rem 1rem;
+        }
+    }
+
+    tbody {
+        tr {
+            &:hover {
+                background-color: rgba(0, 0, 0, 0.03);
+            }
+
+            td {
+                padding: 0.75rem 1rem;
+                vertical-align: middle;
+                border-bottom: 1px solid #eee;
+            }
+        }
+    }
+}
+
+// Report chart content styling
+.report-chart-content {
+    .rp-card-chart {
+        min-height: 200px;
+    }
+
+    .rp-card-information {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 100;
+        display: flex;
+        flex-flow: column wrap;
+        justify-content: center;
+        align-items: center;
+    }
+}
+
+// Front-end affiliate registration form
+.affiliate-register-form {
+    background-color: #f9f9f9;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    margin-bottom: 30px;
+    padding: 20px;
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    label {
+        font-weight: 600;
+    }
+
+    .form-control {
+        border-radius: 3px;
+        height: 40px;
+    }
+
+    textarea.form-control {
+        height: auto;
+    }
+
+    .btn-register {
+        background-color: #5cb85c;
+        border: none;
+        color: #fff;
+        font-weight: 600;
+        padding: 10px 20px;
+
+        &:hover {
+            background-color: darken(#5cb85c, 10%);
+        }
+    }
+}
+
+// QR Code Styles
+.qr-code-container {
+    margin-bottom: 20px;
+
+    .qr-code-image {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        img {
+            max-width: 200px;
+            height: auto;
+        }
+    }
+
+    .qr-code-actions {
+        display: flex;
+        justify-content: center;
+        margin-top: 15px;
+    }
+
+    @include mobile {
+        .qr-code-image img {
+            max-width: 150px;
+        }
+    }
+}
+
+// Social Sharing Styles
+.social-share-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
+
+    a {
+        transition: all 0.3s ease;
+
+        &:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        }
+    }
+
+    @include mobile {
+        justify-content: center;
+    }
+}
+
+// Mobile Responsive Styles
+@include mobile {
+    .card-header {
+        flex-direction: column;
+        align-items: flex-start !important;
+
+        .btn {
+            margin-top: 10px;
+            align-self: flex-start;
+        }
+    }
+
+    .table-responsive {
+        border: 0;
+        margin-bottom: 0;
+
+        table {
+            font-size: 0.9rem;
+        }
+    }
+
+    .input-group {
+        flex-wrap: nowrap;
+    }
+
+    .affiliate-dashboard {
+        .card {
+            margin-bottom: 15px;
+        }
+    }
+
+    .performance-chart-container,
+    .conversion-chart-container {
+        height: 250px !important;
+    }
+}
+
+// Enhanced Conversion Rate Widget Styles
+.conversion-rate-performance-card {
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .performance-icon-wrapper {
+        transition: all 0.3s ease;
+
+        &:hover {
+            transform: scale(1.05);
+        }
+    }
+
+    .performance-tip {
+        transition: all 0.2s ease;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+
+        &:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border-color: rgba(0, 0, 0, 0.12);
+        }
+    }
+
+    .performance-badge {
+        font-weight: 600;
+        letter-spacing: 0.025em;
+        border-radius: 0.5rem;
+
+        &.badge-pulse {
+            animation: pulse-glow 2s infinite;
+        }
+    }
+}
+
+@keyframes pulse-glow {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.02);
+    }
+}
+
+// Responsive adjustments for conversion rate cards
+@include mobile {
+    .conversion-rate-performance-card {
+        .row.g-2 {
+            .col-md-4 {
+                margin-bottom: 0.5rem;
+            }
+        }
+
+        .performance-tip {
+            padding: 0.75rem !important;
+
+            small {
+                font-size: 0.8rem;
+            }
+        }
+    }
+}

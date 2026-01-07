@@ -1,0 +1,15 @@
+<?php
+
+namespace Botble\AffiliatePro\Http\Controllers;
+
+use Botble\Base\Http\Controllers\BaseController as Controller;
+use Botble\Base\Supports\Breadcrumb;
+
+abstract class BaseController extends Controller
+{
+    protected function breadcrumb(): Breadcrumb
+    {
+        return parent::breadcrumb()
+            ->add(trans('plugins/affiliate-pro::affiliate.name'));
+    }
+}

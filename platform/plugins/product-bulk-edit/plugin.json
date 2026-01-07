@@ -1,0 +1,9 @@
+{
+    "name": "Product Bulk Edit",
+    "namespace": "Botble\\ProductBulkEdit\\",
+    "provider": "Botble\\ProductBulkEdit\\Providers\\ProductBulkEditServiceProvider",
+    "author": "Botble Technologies",
+    "url": "https://botble.com",
+    "version": "1.0.0",
+    "description": "Allows bulk editing of products with an Excel-like interface"
+}

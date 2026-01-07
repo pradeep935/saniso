@@ -1,0 +1,42 @@
+/**
+ * Affiliate Commission Info Styles
+ * Styles for the affiliate commission information displayed on product pages
+ */
+
+.affiliate-commission-info {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 1px solid #dee2e6;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+    .badge {
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+
+    .input-group .form-control {
+        font-size: 0.875rem;
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    }
+
+    .btn-sm {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.875rem;
+    }
+}
+
+.affiliate-tip {
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(0, 123, 255, 0.1);
+}
+
+@media (max-width: 768px) {
+    .affiliate-commission-info {
+        .row.g-3 {
+            gap: 1rem;
+        }
+    }
+    
+    .affiliate-actions .col-md-4 {
+        text-align: left !important;
+    }
+}

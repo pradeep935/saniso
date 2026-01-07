@@ -1,0 +1,53 @@
+<?php
+
+return [
+    'name' => 'العمولات',
+    'view' => 'عرض العمولة #:id',
+    'affiliate' => 'المسوق',
+    'order' => 'الطلب',
+    'amount' => 'المبلغ',
+    'description' => 'الوصف',
+    'status' => 'الحالة',
+    'created_at' => 'تم الإنشاء في',
+    'approve' => 'موافقة',
+    'reject' => 'رفض',
+    'approve_success' => 'تمت الموافقة على العمولة بنجاح',
+    'reject_success' => 'تم رفض العمولة بنجاح',
+    'approve_commission' => 'الموافقة على العمولة',
+    'reject_commission' => 'رفض العمولة',
+    'approve_commission_confirmation' => 'هل أنت متأكد من رغبتك في الموافقة على العمولة #:id؟ لا يمكن التراجع عن هذا الإجراء.',
+    'reject_commission_confirmation' => 'هل أنت متأكد من رغبتك في رفض العمولة #:id؟ لا يمكن التراجع عن هذا الإجراء.',
+    'statuses' => [
+        'pending' => 'معلق',
+        'approved' => 'تمت الموافقة',
+        'rejected' => 'مرفوض',
+    ],
+
+    // Customer-facing translations
+    'history' => 'سجل العمولات',
+    'no_commissions' => 'لم يتم العثور على عمولات.',
+    'no_commissions_description' => 'لم تكسب أي عمولة بعد. ابدأ في الترويج لمنتجاتنا لكسب عمولتك الأولى!',
+    'commission_id' => 'رقم العمولة',
+    'order_id' => 'رقم الطلب',
+    'customer' => 'العميل',
+    'product' => 'المنتج',
+    'type' => 'النوع',
+    'date' => 'التاريخ',
+
+    // New UI translations
+    'total_commissions' => ':count إجمالي العمولات',
+    'filter_by_status' => 'تصفية حسب الحالة',
+    'all_statuses' => 'جميع الحالات',
+    'date_from' => 'التاريخ من',
+    'date_to' => 'التاريخ إلى',
+    'filter' => 'تصفية',
+    'clear' => 'مسح',
+    'approved_earnings' => 'الأرباح المعتمدة',
+    'pending_earnings' => 'الأرباح المعلقة',
+    'successful_orders' => 'الطلبات الناجحة',
+    'approval_rate' => 'معدل الموافقة',
+    'commission_earned' => 'العمولة المكتسبة',
+    'showing_results' => 'عرض :from إلى :to من :total نتيجة',
+    'start_promoting' => 'بدء الترويج',
+    'back_to_dashboard' => 'العودة إلى لوحة التحكم',
+];

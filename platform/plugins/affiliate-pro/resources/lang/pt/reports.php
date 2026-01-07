@@ -1,0 +1,73 @@
+<?php
+
+return [
+    'name' => 'Relatórios',
+    'commission_this_month' => 'Comissão este mês',
+    'pending_commissions' => 'Comissões pendentes',
+    'approved_commissions' => 'Comissões aprovadas',
+    'pending_withdrawals' => 'Levantamentos pendentes',
+    'approved_withdrawals' => 'Levantamentos aprovados',
+    'active_affiliates' => 'Afiliados activos',
+    'affiliate_stats' => 'Estatísticas de Afiliados',
+    'top_affiliates' => 'Principais Afiliados',
+    'recent_commissions' => 'Comissões Recentes',
+    'recent_withdrawals' => 'Levantamentos Recentes',
+    'commission_chart' => 'Gráfico de Comissões',
+    'withdrawal_chart' => 'Gráfico de Levantamentos',
+
+    // Enhanced reports
+    'geographic_data' => 'Dados Geográficos',
+    'top_countries' => 'Principais Países',
+    'top_cities' => 'Principais Cidades',
+    'short_link_performance' => 'Desempenho de Links Curtos',
+    'top_performing_links' => 'Links com Melhor Desempenho',
+    'link' => 'Link',
+    'clicks' => 'Cliques',
+    'conversions' => 'Conversões',
+    'commission_trends' => 'Tendências de Comissões',
+    'commission_amount' => 'Valor da Comissão',
+    'loading' => 'A carregar...',
+    'no_data' => 'Sem dados disponíveis',
+    'no_commission_data' => 'Sem dados de comissões disponíveis para o período seleccionado',
+    'no_geographic_data' => 'Sem dados geográficos disponíveis para o período seleccionado',
+    'no_city_data' => 'Sem dados de cidades disponíveis para o país seleccionado',
+    'chart_error' => 'Erro ao renderizar gráfico. Por favor, tente actualizar a página.',
+
+    // Performance metrics widget
+    'performance_metrics' => 'Métricas de Desempenho',
+    'total_clicks' => 'Total de Cliques',
+    'earnings' => 'Ganhos',
+    'avg_commission' => 'Comissão Média',
+    'avg_conversion_rate' => 'Taxa de Conversão Média',
+    'vs_previous' => 'vs anterior',
+    'no_change' => 'Sem alteração',
+    'performance_over_time' => 'Desempenho ao Longo do Tempo',
+    'clicks_conversions' => 'Cliques e Conversões',
+
+    // Conversion rate widget
+    'conversion_rate_analysis' => 'Análise da Taxa de Conversão',
+    'overall_conversion_rate' => 'Taxa de Conversão Geral',
+    'conversion_breakdown' => 'Detalhamento da Conversão',
+    'source' => 'Fonte',
+    'rate' => 'Taxa',
+    'conversion_rate_percentage' => 'Taxa de Conversão (%)',
+    'optimization_opportunity' => 'Oportunidade de Optimização',
+    'conversion_rate_below_average' => 'A sua taxa de conversão está abaixo da média. Considere estas dicas:',
+    'target_relevant_audiences' => 'Direcione para públicos mais relevantes',
+    'improve_promotional_content' => 'Melhore o seu conteúdo promocional',
+    'focus_higher_conversion_products' => 'Foque em produtos com taxas de conversão mais altas',
+    'great_performance' => 'Óptimo Desempenho!',
+    'excellent_conversion_rate' => 'A sua taxa de conversão é excelente. Continue o bom trabalho!',
+    'good_performance' => 'Bom Desempenho',
+    'average_conversion_rate' => 'A sua taxa de conversão está dentro da média. Há espaço para melhorias.',
+
+    // Date ranges (copied from ecommerce for consistency)
+    'ranges' => [
+        'today' => 'Hoje',
+        'this_week' => 'Esta semana',
+        'last_7_days' => 'Últimos 7 dias',
+        'last_30_days' => 'Últimos 30 dias',
+        'this_month' => 'Este mês',
+        'this_year' => 'Este ano',
+    ],
+];

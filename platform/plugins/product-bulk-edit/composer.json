@@ -1,0 +1,26 @@
+{
+    "name": "botble/product-bulk-edit",
+    "description": "Allows bulk editing of products with an Excel-like interface for Botble CMS",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Botble Technologies",
+            "email": "contact@botble.com"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "botble/ecommerce": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Botble\\ProductBulkEdit\\": "src/"
+        },
+        "files": [
+            "helpers/helpers.php"
+        ]
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

@@ -1,0 +1,22 @@
+{
+    "name": "botble/ai-content-generator",
+    "description": "AI Content Generator plugin for Botble CMS",
+    "keywords": ["botble", "ai", "content", "generator", "openai"],
+    "type": "library",
+    "require": {
+        "php": "^8.1",
+        "botble/platform": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Botble\\AIContentGenerator\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Botble\\AIContentGenerator\\Providers\\AIContentGeneratorServiceProvider"
+            ]
+        }
+    }
+}

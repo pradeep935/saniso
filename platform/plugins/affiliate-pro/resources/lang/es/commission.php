@@ -1,0 +1,53 @@
+<?php
+
+return [
+    'name' => 'Comisiones',
+    'view' => 'Ver Comisión #:id',
+    'affiliate' => 'Afiliado',
+    'order' => 'Pedido',
+    'amount' => 'Cantidad',
+    'description' => 'Descripción',
+    'status' => 'Estado',
+    'created_at' => 'Creado el',
+    'approve' => 'Aprobar',
+    'reject' => 'Rechazar',
+    'approve_success' => 'Comisión aprobada con éxito',
+    'reject_success' => 'Comisión rechazada con éxito',
+    'approve_commission' => 'Aprobar Comisión',
+    'reject_commission' => 'Rechazar Comisión',
+    'approve_commission_confirmation' => '¿Estás seguro de que deseas aprobar la comisión #:id? Esta acción no se puede deshacer.',
+    'reject_commission_confirmation' => '¿Estás seguro de que deseas rechazar la comisión #:id? Esta acción no se puede deshacer.',
+    'statuses' => [
+        'pending' => 'Pendiente',
+        'approved' => 'Aprobado',
+        'rejected' => 'Rechazado',
+    ],
+
+    // Customer-facing translations
+    'history' => 'Historial de Comisiones',
+    'no_commissions' => 'No se encontraron comisiones.',
+    'no_commissions_description' => '¡Aún no has ganado ninguna comisión. Comienza a promocionar nuestros productos para ganar tu primera comisión!',
+    'commission_id' => 'ID de Comisión',
+    'order_id' => 'ID de Pedido',
+    'customer' => 'Cliente',
+    'product' => 'Producto',
+    'type' => 'Tipo',
+    'date' => 'Fecha',
+
+    // New UI translations
+    'total_commissions' => ':count Comisiones Totales',
+    'filter_by_status' => 'Filtrar por Estado',
+    'all_statuses' => 'Todos los Estados',
+    'date_from' => 'Fecha Desde',
+    'date_to' => 'Fecha Hasta',
+    'filter' => 'Filtrar',
+    'clear' => 'Limpiar',
+    'approved_earnings' => 'Ganancias Aprobadas',
+    'pending_earnings' => 'Ganancias Pendientes',
+    'successful_orders' => 'Pedidos Exitosos',
+    'approval_rate' => 'Tasa de Aprobación',
+    'commission_earned' => 'Comisión Ganada',
+    'showing_results' => 'Mostrando :from a :to de :total resultados',
+    'start_promoting' => 'Comenzar a Promocionar',
+    'back_to_dashboard' => 'Volver al Panel',
+];

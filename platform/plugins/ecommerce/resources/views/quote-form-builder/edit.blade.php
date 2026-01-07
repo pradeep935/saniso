@@ -1,0 +1,1 @@
+@extends('plugins/ecommerce::quote-form-builder.create')

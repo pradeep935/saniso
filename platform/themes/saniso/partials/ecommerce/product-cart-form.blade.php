@@ -1,0 +1,91 @@
+@php
+    // Check if this product is quote-only (price is 0)
+    $isQuoteOnly = $product->price <= 0;
+@endphp
+
+@if ($isQuoteOnly)
+    {{-- Quote-only product - show quote request button --}}
+    <div class="product-quote-buttons d-flex align-items-center gap-2">
+        <div class="quote-price-display flex-grow-1">
+            <span class="text-primary fw-bold">{{ __('Contact for Price') }}</span>
+        </div>
+        <a 
+            href="{{ $product->url }}" 
+            class="btn btn-primary"
+            title="{{ __('View Product & Request Quote') }}"
+        >
+            <i class="fas fa-quote-left me-1"></i>
+            {{ __('Request Quote') }}
+        </a>
+    </div>
+@else
+    {{-- Regular product with price - show cart form --}}
+    <form
+        class="cart-form"
+        action="{{ route('public.cart.add-to-cart') }}"
+        method="POST"
+    >
+        @csrf
+        @if (!empty($withVariations) && $product->variations()->count())
+            <div class="pr_switch_wrap">
+                {!! render_product_swatches($product, [
+                    'selected' => $selectedAttrs,
+                ]) !!}
+            </div>
+        @endif
+
+        @if (isset($withProductOptions) && $withProductOptions)
+            {!! render_product_options($product) !!}
+        @endif
+
+        <input
+            class="hidden-product-id"
+            name="id"
+            type="hidden"
+            value="{{ $product->is_variation || !$product->defaultVariation->product_id ? $product->id : $product->defaultVariation->product_id }}"
+        />
+
+        @if (EcommerceHelper::isCartEnabled() || !empty($withButtons))
+            {!! apply_filters(ECOMMERCE_PRODUCT_DETAIL_EXTRA_HTML, null, $product) !!}
+            <div class="product-button d-flex align-items-center gap-2">
+                @if (EcommerceHelper::isCartEnabled())
+                    {!! Theme::partial('ecommerce.product-quantity', compact('product')) !!}
+                    <button
+                        class="btn btn-primary mb-2 add-to-cart-button @if ($product->isOutOfStock()) disabled @endif"
+                        name="add_to_cart"
+                        type="submit"
+                        value="{{ $product->min_cart_quantity }}"
+                        title="{{ __('Add to cart') }}"
+                        @if ($product->isOutOfStock()) disabled @endif
+                    >
+                        <span class="svg-icon">
+                            <svg>
+                                <use
+                                    href="#svg-icon-cart"
+                                    xlink:href="#svg-icon-cart"
+                                ></use>
+                            </svg>
+                        </span>
+                        <span class="add-to-cart-text ms-2 d-none d-lg-inline">{{ __('Add to cart') }}</span>
+                    </button>
+
+                    @if (EcommerceHelper::isQuickBuyButtonEnabled() && isset($withBuyNow) && $withBuyNow)
+                        <button
+                            class="btn btn-primary btn-black mb-2 add-to-cart-button @if ($product->isOutOfStock()) disabled @endif"
+                            name="checkout"
+                            type="submit"
+                            value="{{ $product->min_cart_quantity }}"
+                            title="{{ __('Buy Now') }}"
+                            @if ($product->isOutOfStock()) disabled @endif
+                        >
+                            <span class="add-to-cart-text ms-2 d-none d-lg-inline">{{ __('Buy Now') }}</span>
+                        </button>
+                    @endif
+                @endif
+                @if (!empty($withButtons))
+                    {!! Theme::partial('ecommerce.product-loop-buttons', compact('product', 'wishlistIds')) !!}
+                @endif
+            </div>
+        @endif
+    </form>
+@endif

@@ -1,0 +1,9 @@
+{
+    "id": "botble/farmart",
+    "name": "Saniso",
+    "namespace": "Theme\\Farmart\\",
+    "description": "Saniso – Your Online Store Theme",
+    "author": "Saniso.nl",
+    "version": "1.1.0",
+    "required_plugins": []
+}

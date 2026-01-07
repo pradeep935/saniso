@@ -1,0 +1,11 @@
+{
+    "id": "botble/ai-content-generator",
+    "name": "AI Content Generator",
+    "namespace": "Botble\\AIContentGenerator\\",
+    "provider": "Botble\\AIContentGenerator\\Providers\\AIContentGeneratorServiceProvider",
+    "author": "Krishna Patel",
+    "url": null,
+    "version": "1.0.0",
+    "description": "Generate content for products and blog posts using AI",
+    "minimum_core_version": "7.0.0"
+}

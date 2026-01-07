@@ -1,0 +1,364 @@
+/* Multi-Branch Inventory - Components and Partials CSS */
+
+/* Product Branch Selection Component */
+.multi-branch-inventory-section {
+    display: none;
+}
+
+.branch-inventory-fields {
+    display: none;
+}
+
+.branch-inventory-fields.show {
+    display: block;
+}
+
+/* Branch Selection Container */
+.branch-selection-container {
+    background: #f8f9fc;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+    border: 2px solid #e3e6f0;
+}
+
+.branch-selection-title {
+    color: #5a5c69;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.branch-checkbox-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.branch-checkbox-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #e3e6f0;
+    transition: all 0.3s ease;
+}
+
+.branch-checkbox-item:hover {
+    border-color: #667eea;
+    background: #f8f9fc;
+}
+
+.branch-checkbox-item input[type="checkbox"] {
+    margin-right: 0.5rem;
+}
+
+.branch-toggle-all {
+    margin-bottom: 1rem;
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.branch-toggle-all:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+/* Inventory Field Groups */
+.inventory-field-group {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid #e3e6f0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.inventory-field-title {
+    color: #333;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    font-size: 1rem;
+}
+
+.inventory-field-title i {
+    margin-right: 0.5rem;
+    color: #667eea;
+}
+
+.inventory-input-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.inventory-input-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.inventory-input-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #5a5c69;
+    font-size: 0.9rem;
+}
+
+.inventory-input {
+    padding: 0.75rem;
+    border: 1px solid #e3e6f0;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+}
+
+.inventory-input:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    outline: none;
+}
+
+/* Table Component Styles */
+.inventory-table-container {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+    border: none;
+}
+
+.inventory-table-header {
+    background: linear-gradient(135deg, #f8f9fc 0%, #e9ecef 100%);
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #e3e6f0;
+}
+
+.inventory-table-title {
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 0;
+    font-size: 1.2rem;
+}
+
+.inventory-table {
+    width: 100%;
+    margin-bottom: 0;
+}
+
+.inventory-table thead th {
+    background: #f8f9fc;
+    border: none;
+    padding: 1rem 0.75rem;
+    font-weight: 600;
+    color: #5a5c69;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.inventory-table tbody td {
+    padding: 1rem 0.75rem;
+    border-bottom: 1px solid #f1f1f1;
+    vertical-align: middle;
+}
+
+.inventory-table tbody tr:hover {
+    background: #f8f9fc;
+}
+
+/* Status Indicators */
+.status-indicator {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-active {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-inactive {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.status-low-stock {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-out-of-stock {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* Action Buttons */
+.action-btn-group {
+    display: flex;
+    gap: 0.25rem;
+    flex-wrap: wrap;
+}
+
+.action-btn {
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    border: none;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.action-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.action-btn i {
+    margin-right: 0.25rem;
+}
+
+.action-btn-primary {
+    background: #667eea;
+    color: white;
+}
+
+.action-btn-success {
+    background: #28a745;
+    color: white;
+}
+
+.action-btn-warning {
+    background: #ffc107;
+    color: #212529;
+}
+
+.action-btn-danger {
+    background: #dc3545;
+    color: white;
+}
+
+.action-btn-info {
+    background: #17a2b8;
+    color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .branch-checkbox-group {
+        grid-template-columns: 1fr;
+    }
+    
+    .inventory-input-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .action-btn-group {
+        flex-direction: column;
+    }
+    
+    .inventory-table-container {
+        border-radius: 10px;
+    }
+    
+    .inventory-table thead th,
+    .inventory-table tbody td {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.85rem;
+    }
+}
+
+/* Animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.inventory-field-group {
+    animation: fadeInUp 0.4s ease forwards;
+}
+
+.inventory-field-group:nth-child(2) { animation-delay: 0.1s; }
+.inventory-field-group:nth-child(3) { animation-delay: 0.2s; }
+.inventory-field-group:nth-child(4) { animation-delay: 0.3s; }
+
+/* Branch selection components */
+.multi-branch-inventory-section-hidden {
+    display: none;
+}
+
+.branch-quantity-section {
+    transition: all 0.3s ease-in-out;
+}
+
+.branch-quantity-section-visible {
+    display: block !important;
+}
+
+.branch-quantity-section-hidden {
+    display: none !important;
+}
+
+.card.border {
+    transition: all 0.2s ease-in-out;
+}
+
+.card.border:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border-color: #206bc4;
+}
+
+.form-check-input:checked + .form-check-label {
+    color: #206bc4;
+    font-weight: 600;
+}
+
+#select_all_branches:checked + .form-check-label {
+    color: #198754;
+}
+
+.badge {
+    font-size: 0.7em;
+}
+
+.form-check {
+    padding: 0.5rem;
+    border: 1px solid #e3e6f0;
+    border-radius: 0.35rem;
+    transition: all 0.15s ease-in-out;
+}
+
+.form-check:hover {
+    border-color: #5a5c69;
+    background-color: #f8f9fc;
+}
+
+.form-check-input:checked ~ .form-check-label {
+    color: #5a5c69;
+    font-weight: 600;
+}

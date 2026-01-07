@@ -1,0 +1,16 @@
+{
+  "id": "platform/in-store-product-scanner",
+  "name": "In-Store Product Scanner",
+  "title": "In-Store Product Scanner",
+  "description": "Browser-based in-store product barcode/QR scanner for Botble CMS e-commerce.",
+  "author": "Generated",
+  "version": "1.0.0",
+  "autoload": {
+    "psr-4": {
+      "Platform\\InStoreProductScanner\\": "src/"
+    }
+  },
+  "namespace": "Platform\\InStoreProductScanner\\",
+  "provider": "Platform\\InStoreProductScanner\\Providers\\PluginServiceProvider",
+  "minimum_core_version": "7.3.0"
+}

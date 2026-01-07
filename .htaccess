@@ -1,0 +1,27 @@
+RewriteEngine on
+
+# --- Allow Let's Encrypt challenge requests (skip rewrites) ---
+RewriteCond %{REQUEST_URI} ^/.well-known/acme-challenge/ [NC]
+RewriteRule ^ - [L]
+
+# --- Force HTTPS (but not for reverse proxy) ---
+RewriteCond %{HTTPS} off
+RewriteCond %{HTTP:X-Forwarded-Proto} !https
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# --- Force www subdomain (but not for reverse proxy) ---
+RewriteCond %{HTTP_HOST} ^saniso\.nl$ [NC]
+RewriteCond %{HTTP:X-Forwarded-Proto} !https
+RewriteRule ^ https://www.saniso.nl%{REQUEST_URI} [L,R=301]
+
+
+RewriteEngine on
+
+# Redirect Trailing Slashes If Not A Folder...
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} (.+)/$
+RewriteRule ^ %1 [L,R=301]
+
+RewriteCond %{REQUEST_URI} !^public
+
+RewriteRule ^(.*)$ public/$1 [L]

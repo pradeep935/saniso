@@ -1,0 +1,14 @@
+{
+    "id": "botble/multi-branch-inventory",
+    "name": "Multi-Branch Inventory System",
+    "namespace": "Botble\\MultiBranchInventory\\",
+    "provider": "Botble\\MultiBranchInventory\\Providers\\MultiBranchInventoryServiceProvider",
+    "author": "Mentocode Team",
+    "url": "https://botble.com",
+    "version": "1.0.0",
+    "description": "Advanced multi-branch inventory management with POS integration, incoming goods registration, stock transfers, and real-time synchronization",
+    "minimum_core_version": "7.5.0",
+    "require": [
+        "botble/ecommerce"
+    ]
+}

@@ -1,0 +1,1 @@
+(()=>{"use strict";$(document).ready(function(){$(document).on("change","#discount-type",function(){var t=$(this).val(),a=$("#discount-amount");"percentage"===t?(a.attr("max",100),parseFloat(a.val())>100&&a.val(100)):a.removeAttr("max")})})})();

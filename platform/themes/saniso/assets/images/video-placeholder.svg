@@ -1,0 +1,4 @@
+/* Video Placeholder SVG */
+.video-placeholder-svg {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='225' viewBox='0 0 400 225'%3E%3Crect width='400' height='225' fill='%23667eea'/%3E%3Cg transform='translate(200 112.5)'%3E%3Ccircle cx='0' cy='0' r='30' fill='%23ffffff' opacity='0.9'/%3E%3Cpolygon points='-10,-10 -10,10 15,0' fill='%23667eea'/%3E%3C/g%3E%3Ctext x='200' y='200' text-anchor='middle' fill='%23ffffff' font-family='Arial, sans-serif' font-size='16' opacity='0.8'%3EVideo Thumbnail%3C/text%3E%3C/svg%3E");
+}
