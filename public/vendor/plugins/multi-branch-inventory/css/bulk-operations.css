@@ -1,0 +1,233 @@
+/* Multi-Branch Inventory - Bulk Operations Styles */
+
+.modern-bulk-interface {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.gradient-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+}
+
+.gradient-header h1 {
+    font-weight: 700;
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.gradient-header p {
+    font-size: 1.05rem;
+    opacity: 0.9;
+    margin-bottom: 0;
+}
+
+.modern-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+    border: none;
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.modern-card-header {
+    padding: 2rem;
+    background: white;
+    border: 0;
+}
+
+.modern-card-body {
+    padding: 2rem;
+}
+
+.modern-form-control {
+    border-radius: 12px;
+    border: 2px solid #e3e6f0;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+}
+
+.modern-form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+.modern-btn {
+    border-radius: 12px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.modern-table {
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+}
+
+/* Product Image Styles */
+.product-image {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.no-image {
+    width: 50px;
+    height: 50px;
+    background: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    color: #999;
+}
+
+/* Table Column Widths */
+.col-image {
+    width: 60px;
+}
+
+.col-quantity {
+    width: 100px;
+}
+
+.col-price {
+    width: 100px;
+}
+
+/* Bulk Selection */
+.bulk-select {
+    padding: 1rem;
+    background: #f8f9fc;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+}
+
+.bulk-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+/* Filter Section */
+.filter-section {
+    background: #f8f9fc;
+    padding: 1.5rem;
+    border-radius: 15px;
+    margin-bottom: 1.5rem;
+}
+
+.filter-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    align-items: end;
+}
+
+/* Progress Indicators */
+.progress-container {
+    margin: 1rem 0;
+}
+
+.progress-bar-custom {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    transition: width 0.3s ease;
+}
+
+/* Loading States */
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .gradient-header {
+        padding: 1.5rem;
+        text-align: center;
+    }
+    
+    .gradient-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .modern-card-header,
+    .modern-card-body {
+        padding: 1.5rem;
+    }
+    
+    .bulk-actions {
+        flex-direction: column;
+    }
+    
+    .filter-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Animation */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modern-card {
+    animation: slideInUp 0.4s ease forwards;
+}
+
+.modern-card:nth-child(5) { animation-delay: 0.4s; }
+
+/* Table Column Widths */
+th.col-image { width: 60px; }
+th.col-quantity { width: 100px; }
+th.col-price { width: 100px; }
+th.col-stock { width: 100px; }
+th.col-online { width: 100px; }
+th.col-pos { width: 100px; }
+
+/* Additional Utilities */
+.card-padding {
+    padding: 2rem;
+}
+
+.stock-details {
+    margin-top: 0.5rem;
+    display: none;
+}
+.modern-card:nth-child(3) { animation-delay: 0.2s; }
+.modern-card:nth-child(4) { animation-delay: 0.3s; }
