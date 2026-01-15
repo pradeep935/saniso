@@ -63,31 +63,34 @@
 
                         <div class="product-variations mb-4">
 
-                            @foreach($groupData['options'] as $setName => $attributes)
-                                <div class="variation-group mb-3">
-                                    <label class="form-label fw-semibold">{{ ucfirst($setName) }}</label>
-                                    
-                                    <div class="d-flex flex-wrap gap-2 
-                                                {{ $setName == 'color' ? 'color-swatches' : 'size-pills' }}">
-                                        
-                                        @foreach($attributes as $id => $attr)
-                                            <a href="{{ $attr['url'] ?? 'javascript:void(0)' }}"
-                                               class="variation-btn {{ $setName }}-btn"
-                                               data-attr="{{ $setName }}"
-                                               data-id="{{ $id }}"
-                                               @if($setName == 'color')
-                                                   style="background-color: {{ $attr['color'] ?? '#000' }}"
-                                               @endif
-                                               title="{{ $attr['label'] }}">
-                                                @if($setName != 'color')
-                                                    {{ $attr['label'] }}
-                                                @endif
-                                            </a>
-                                        @endforeach
+                            @if(!empty($groupData['options']))
+                                @foreach($groupData['options'] as $setName => $attributes)
+                                    <div class="variation-group mb-3">
+                                        <label class="form-label fw-semibold">{{ ucfirst($setName) }}</label>
 
+                                        <div class="d-flex flex-wrap gap-2 
+                                            {{ $setName == 'color' ? 'color-swatches' : 'size-pills' }}">
+
+                                            @foreach($attributes as $id => $attr)
+                                                <a href="{{ $attr['url'] ?? 'javascript:void(0)' }}"
+                                                   class="variation-btn {{ $setName }}-btn"
+                                                   data-attr="{{ $setName }}"
+                                                   data-id="{{ $id }}"
+                                                   @if($setName == 'color')
+                                                       style="background-color: {{ $attr['color'] ?? '#000' }}"
+                                                   @endif
+                                                   title="{{ $attr['label'] }}">
+                                                    @if($setName != 'color')
+                                                        {{ $attr['label'] }}
+                                                    @endif
+                                                </a>
+                                            @endforeach
+
+                                        </div>
                                     </div>
-                                </div>
-                            @endforeach
+                                @endforeach
+                            @endif
+
 
                         </div>
 
