@@ -1073,49 +1073,53 @@ class Product extends BaseModel
         ->get();
     }
 
-    public function groupOptions(): array {
-        $products = $this->groupProducts();
 
-        if ($products->isEmpty()) {
-            return [];
-        }
 
-        $options = [];
 
-        foreach ($products as $product) {
-            $groupAttributes = $product->group_attributes ?? [];
+public function groupOptions(): array
+{
+    $products = $this->groupProducts();
 
-            foreach ($groupAttributes as $setId => $attrId) {
+    if ($products->isEmpty()) {
+        return [];
+    }
 
-                $attr = DB::table('ec_product_attributes AS a')
-                ->join('ec_product_attribute_sets AS s', 's.id', '=', 'a.attribute_set_id')
-                    ->leftJoin('product_colors AS c', 'c.id', '=', 'a.id')
-                    ->where('s.id', $setId)
-                    ->where('a.id', $attrId)
-                    ->select(
-                        's.id AS set_id',
-                        's.title AS set_name',
-                        'a.id AS attribute_id',
-                        'a.title AS attribute_name',
-                        'a.color'
-                    )
-                    ->first();
+    $options = [];
 
-                    if (!$attr) continue;
+    foreach ($products as $product) {
+        foreach ($product->group_attributes ?? [] as $setId => $attrId) {
 
-                $setKey = strtolower($attr->set_name);
+            $attr = DB::table('ec_product_attributes as a')
+                ->join('ec_product_attribute_sets as s', 's.id', '=', 'a.attribute_set_id')
+                ->where('a.id', $attrId)
+                ->select(
+                    's.id as set_id',
+                    's.title as set_name',
+                    'a.id as attribute_id',
+                    'a.title as attribute_name',
+                    'a.color' // only if column exists
+                )
+                ->first();
 
+            if (! $attr) {
+                continue;
+            }
+
+            $setKey = Str::slug($attr->set_name);
+
+            // IMPORTANT: do not overwrite existing attribute
+            if (! isset($options[$setKey][$attr->attribute_id])) {
                 $options[$setKey][$attr->attribute_id] = [
                     'label' => $attr->attribute_name,
-                    'color'   => $attr->color ?? null,
+                    'color' => $attr->color ?? null,
                     'url'   => $product->url,
                 ];
             }
         }
-
-        return compact('options');
     }
 
+    return compact('options');
+}
 
 
 
