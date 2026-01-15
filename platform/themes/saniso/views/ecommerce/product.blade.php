@@ -9,6 +9,7 @@
 
 @php
     $groupData = $product->groupOptions();
+    dd($groupData);
 @endphp
 {!! Theme::partial('page-header', ['size' => 'xxxl']) !!}
 
