@@ -17,6 +17,11 @@ AdminHelper::registerRoutes(function (): void {
                 'permission' => 'products.duplicate',
             ]);
 
+            Route::get('get-my-products-for-select', [
+                'as' => 'get-my-products-for-select',
+                'uses' => 'ProductController@getMyProductsForSelect',
+            ]);
+
             Route::post('add-attribute-to-product/{id}', [
                 'as' => 'add-attribute-to-product',
                 'uses' => 'ProductController@postAddAttributeToProduct',
@@ -156,6 +161,7 @@ AdminHelper::registerRoutes(function (): void {
                     'uses' => 'ProductLicenseCodeController@bulkGenerate',
                     'permission' => 'products.edit',
                 ]);
+
             });
         });
     });

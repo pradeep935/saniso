@@ -6,6 +6,10 @@
     use Botble\Ecommerce\Models\QuoteSettings;
     $isQuoteMode = QuoteSettings::shouldShowQuoteForm($product);
 @endphp
+
+@php
+    $groupData = $product->groupOptions();
+@endphp
 {!! Theme::partial('page-header', ['size' => 'xxxl']) !!}
 
 <div class="product-detail-container">
@@ -56,6 +60,37 @@
                             {!! BaseHelper::clean($product->description) !!}
                             {!! apply_filters('ecommerce_after_product_description', null, $product) !!}
                         </div>
+
+                        <div class="product-variations mb-4">
+
+                            @foreach($groupData['options'] as $setName => $attributes)
+                                <div class="variation-group mb-3">
+                                    <label class="form-label fw-semibold">{{ ucfirst($setName) }}</label>
+                                    
+                                    <div class="d-flex flex-wrap gap-2 
+                                                {{ $setName == 'color' ? 'color-swatches' : 'size-pills' }}">
+                                        
+                                        @foreach($attributes as $id => $attr)
+                                            <a href="{{ $attr['url'] ?? 'javascript:void(0)' }}"
+                                               class="variation-btn {{ $setName }}-btn"
+                                               data-attr="{{ $setName }}"
+                                               data-id="{{ $id }}"
+                                               @if($setName == 'color')
+                                                   style="background-color: {{ $attr['color'] ?? '#000' }}"
+                                               @endif
+                                               title="{{ $attr['label'] }}">
+                                                @if($setName != 'color')
+                                                    {{ $attr['label'] }}
+                                                @endif
+                                            </a>
+                                        @endforeach
+
+                                    </div>
+                                </div>
+                            @endforeach
+
+                        </div>
+
 
                         {!! Theme::partial('ecommerce.product-availability', compact('product', 'productVariation')) !!}
                         @if (Botble\Ecommerce\Facades\FlashSale::isEnabled() && ($flashSale = $product->latestFlashSales()->first()))
@@ -837,4 +872,23 @@
         margin-bottom: 8px !important;
     }
 }
+
+.variation-btn.active {
+    border: 2px solid #000;
+    outline: none;
+}
+.color-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 1px solid #ccc;
+}
+.size-pills .variation-btn {
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    border: 1px solid #ccc;
+}
+
 </style>

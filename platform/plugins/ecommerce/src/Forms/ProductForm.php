@@ -136,7 +136,55 @@ class ProductForm extends FormAbstract
                             ->emptyValue(trans('plugins/ecommerce::brands.select_brand'))
                             ->allowClear()
                     );
+
+
+                $this->add('product_group_id', SelectField::class, [
+                    'label' => 'Product Group',
+                    'label_attr' => ['class' => 'control-label'],
+                    'choices' => [],
+                    'empty_value' => '— Select group product —',
+                    'attr' => [
+                        'class' => 'form-control select2-select',
+                        'data-placeholder' => 'Search product by name or SKU',
+                        'data-ajax--url' => route('products.get-my-products-for-select'),
+                    ],
+                    'value' => $this->getModel()->product_group_id,
+                ]);
+
+
+                $attributeSets = ProductAttributeSet::query()
+                    ->where('status', 'published')
+                    ->with('attributes')
+                    ->orderBy('order')
+                    ->get();
+
+                $savedAttributes = $this->getModel()->group_attributes ?? [];
+
+                foreach ($attributeSets as $set) {
+                    if ($set->attributes->isEmpty()) continue;
+
+                    $choices = [];
+
+                    foreach ($set->attributes as $attribute) {
+                        $choices[(string)$attribute->id] = $attribute->title;
+                    }
+
+                    $savedValue = isset($savedAttributes[$set->id]) ? (string)$savedAttributes[$set->id] : null;
+                    $this->add(
+                        'group_attributes_' . $set->id,
+                        SelectField::class,
+                        [
+                            'label' => $set->title,
+                            'choices' => $choices,
+                            'empty_value' => '— Select ' . $set->title . ' —',
+                            'attr' => ['class' => 'form-control select2-select'],
+                            'value' => $savedValue,
+                        ]
+                    );
+
+                } 
             })
+
             ->add(
                 'image',
                 MediaImageField::class,

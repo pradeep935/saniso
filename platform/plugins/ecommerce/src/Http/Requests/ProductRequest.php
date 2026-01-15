@@ -19,8 +19,10 @@ use Illuminate\Validation\Rule;
 
 class ProductRequest extends Request
 {
-    protected function prepareForValidation(): void
-    {
+
+
+    protected function prepareForValidation(): void{
+
         $options = $this->input('options');
 
         if (! empty($options)) {
@@ -39,11 +41,22 @@ class ProductRequest extends Request
             }
         }
 
+        $groupAttributes = [];
+
+        foreach ($this->all() as $key => $value) {
+            if (str_starts_with($key, 'group_attributes_') && $value !== null && $value !== '') {
+                $setId = str_replace('group_attributes_', '', $key);
+                $groupAttributes[$setId] = $value;
+            }
+        }
+
         $this->merge([
             'options' => $options,
+            'group_attributes' => $groupAttributes,
             'notify_attachment_updated' => $this->boolean('notify_attachment_updated'),
         ]);
     }
+
 
     public function rules(): array
     {

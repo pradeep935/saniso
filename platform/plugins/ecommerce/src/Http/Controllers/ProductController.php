@@ -262,4 +262,24 @@ class ProductController extends BaseController
             ->httpResponse()
             ->withUpdatedSuccessMessage();
     }
+
+    public function getMyProductsForSelect(Request $request){
+        $query = Product::query();
+
+        if ($search = $request->input('q')) {
+            $query->where('name', 'like', "%{$search}%")->orWhere('sku', 'like', "%{$search}%");
+        }
+
+        $query->where('available_in_webshop', true);
+
+        $products = $query->limit(50)->get(['id', 'name', 'sku']);
+
+        $results = $products->map(fn($p) => [
+            'id' => $p->id,
+            'text' => "{$p->name} ({$p->sku})"
+        ]);
+
+        return response()->json(['results' => $results]);
+    }
+
 }

@@ -85,6 +85,8 @@ class Product extends BaseModel
         'available_in_pos',
         'available_in_webshop',
         'store_id',
+        'product_group_id',
+        'group_attributes',
     ];
 
     protected $appends = [
@@ -126,6 +128,8 @@ class Product extends BaseModel
         'reviews_avg' => 'float',
         'available_in_pos' => 'bool',
         'available_in_webshop' => 'bool',
+        'group_attributes' => 'array',
+
     ];
 
     /**
@@ -1052,4 +1056,67 @@ class Product extends BaseModel
     {
         return !$this->isQuoteOnly();
     }
+
+    public function group(){
+        return $this->belongsTo(Product::class, 'product_group_id');
+    }
+
+
+    public function groupProducts() {
+        if (! $this->product_group_id) {
+            return collect();
+        }
+
+        return self::query()
+        ->where('product_group_id', $this->product_group_id)
+        ->where('status', BaseStatusEnum::PUBLISHED)
+        ->get();
+    }
+
+    public function groupOptions(): array {
+        $products = $this->groupProducts();
+
+        if ($products->isEmpty()) {
+            return [];
+        }
+
+        $options = [];
+
+        foreach ($products as $product) {
+            $groupAttributes = $product->group_attributes ?? [];
+
+            foreach ($groupAttributes as $setId => $attrId) {
+
+                $attr = DB::table('ec_product_attributes AS a')
+                ->join('ec_product_attribute_sets AS s', 's.id', '=', 'a.attribute_set_id')
+                    ->leftJoin('product_colors AS c', 'c.id', '=', 'a.id')
+                    ->where('s.id', $setId)
+                    ->where('a.id', $attrId)
+                    ->select(
+                        's.id AS set_id',
+                        's.title AS set_name',
+                        'a.id AS attribute_id',
+                        'a.title AS attribute_name',
+                        'a.color'
+                    )
+                    ->first();
+
+                    if (!$attr) continue;
+
+                $setKey = strtolower($attr->set_name);
+
+                $options[$setKey][$attr->attribute_id] = [
+                    'label' => $attr->attribute_name,
+                    'color'   => $attr->color ?? null,
+                    'url'   => $product->url,
+                ];
+            }
+        }
+
+        return compact('options');
+    }
+
+
+
+
 }
