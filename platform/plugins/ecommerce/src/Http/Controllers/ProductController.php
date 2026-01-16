@@ -133,25 +133,32 @@ class ProductController extends BaseController
 
         $groupedProducts = $request->input('grouped_products', []);
 
-        if (is_string($groupedProducts)) {
-            $groupedProducts = explode(',', $groupedProducts);
-        } elseif (!is_array($groupedProducts)) {
-            $groupedProducts = [];
-        }
+        $groupedProducts = array_map(fn($item) => is_array($item) ? intval($item[0]) : intval($item), $groupedProducts);
 
         if (!in_array($product->getKey(), $groupedProducts)) {
             $groupedProducts[] = $product->getKey();
         }
 
-        $groupId = $product->getKey();
+        $existingGroupId = Product::whereIn('id', $groupedProducts)
+            ->whereNotNull('product_group_id')
+            ->pluck('product_group_id')
+            ->first();
 
-        foreach ($groupedProducts as $productId) {
+        $groupId = $existingGroupId ?? $product->getKey();
+
+        $allProductIds = Product::where('product_group_id', $groupId)
+            ->pluck('id')
+            ->merge($groupedProducts)
+            ->unique()
+            ->toArray();
+
+        foreach ($allProductIds as $productId) {
             $p = Product::with('productAttributeSets.attributes')->find($productId);
             if (!$p) continue;
 
             $p->product_group_id = $groupId;
 
-            if ($p->getKey() == $product->getKey()) {
+            if ($p->getKey() === $product->getKey()) {
                 $p->group_attributes = $request->input('group_attributes', []);
             } else {
                 $p->group_attributes = $p->group_attributes ?? [];
@@ -224,27 +231,32 @@ class ProductController extends BaseController
 
         $groupedProducts = $request->input('grouped_products', []);
 
-
-        if (is_string($groupedProducts)) {
-            $groupedProducts = explode(',', $groupedProducts);
-        } elseif (!is_array($groupedProducts)) {
-            $groupedProducts = [];
-        }
-
+        $groupedProducts = array_map(fn($item) => is_array($item) ? intval($item[0]) : intval($item), $groupedProducts);
 
         if (!in_array($product->getKey(), $groupedProducts)) {
             $groupedProducts[] = $product->getKey();
         }
 
-        $groupId = $product->getKey();
+        $existingGroupId = Product::whereIn('id', $groupedProducts)
+            ->whereNotNull('product_group_id')
+            ->pluck('product_group_id')
+            ->first();
 
-        foreach ($groupedProducts as $productId) {
+        $groupId = $existingGroupId ?? $product->getKey();
+
+        $allProductIds = Product::where('product_group_id', $groupId)
+            ->pluck('id')
+            ->merge($groupedProducts)
+            ->unique()
+            ->toArray();
+
+        foreach ($allProductIds as $productId) {
             $p = Product::with('productAttributeSets.attributes')->find($productId);
             if (!$p) continue;
 
             $p->product_group_id = $groupId;
 
-            if ($p->getKey() == $product->getKey()) {
+            if ($p->getKey() === $product->getKey()) {
                 $p->group_attributes = $request->input('group_attributes', []);
             } else {
                 $p->group_attributes = $p->group_attributes ?? [];
@@ -252,6 +264,7 @@ class ProductController extends BaseController
 
             $p->save();
         }
+
 
 
         $relatedProductIds = $product->variations()->pluck('product_id')->all();

@@ -137,35 +137,24 @@ class ProductForm extends FormAbstract
                             ->allowClear()
                     );
 
-
-                // $this->add('product_group_id', SelectField::class, [
-                //     'label' => 'Product Group',
-                //     'label_attr' => ['class' => 'control-label'],
-                //     'choices' => [],
-                //     'empty_value' => '— Select group product —',
-                //     'attr' => [
-                //         'class' => 'form-control select2-select',
-                //         'data-placeholder' => 'Search product by name or SKU',
-                //         'data-ajax--url' => route('products.get-my-products-for-select'),
-                //     ],
-                //     'value' => $this->getModel()->product_group_id,
-                // ]);
-
-                $this->add('grouped_products', \Botble\Base\Forms\Fields\SelectField::class, [
-                    'label' => 'Product Group',
-                    'label_attr' => ['class' => 'control-label'],
-                    'choices' => [],
-                    'empty_value' => '— Select products —',
-                    'attr' => [
-                        'class' => 'form-control select2-select',
+            $this->add(
+                'grouped_products[]',
+                SelectField::class,
+                SelectFieldOption::make()
+                    ->label('Product Group')
+                    ->choices($this->getGroupedProductChoices())
+                    ->selected($this->getSelectedGroupProducts())
+                    ->searchable()
+                    ->multiple()
+                    ->allowClear()
+                    ->attributes([
+                        'class' => 'select2-select',
+                        'multiple' => 'multiple',
                         'data-placeholder' => 'Search product by name or SKU',
                         'data-ajax--url' => route('products.get-my-products-for-select'),
-                        'multiple' => 'multiple', // <-- enable multi-select
-                    ],
-                    'value' => $this->getSelectedGroupProducts(),
-                ]);
-
-
+                        'data-minimum-input-length' => 3,
+                    ])
+            );
 
 
 
@@ -466,5 +455,20 @@ class ProductForm extends FormAbstract
 
     return [];
 }
+
+protected function getGroupedProductChoices(): array
+{
+    $ids = $this->getSelectedGroupProducts();
+
+    if (empty($ids)) {
+        return [];
+    }
+
+    return \Botble\Ecommerce\Models\Product::query()
+        ->whereIn('id', $ids)
+        ->pluck('name', 'id')
+        ->toArray();
+}
+
 
 }
