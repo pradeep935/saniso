@@ -138,18 +138,37 @@ class ProductForm extends FormAbstract
                     );
 
 
-                $this->add('product_group_id', SelectField::class, [
+                // $this->add('product_group_id', SelectField::class, [
+                //     'label' => 'Product Group',
+                //     'label_attr' => ['class' => 'control-label'],
+                //     'choices' => [],
+                //     'empty_value' => '— Select group product —',
+                //     'attr' => [
+                //         'class' => 'form-control select2-select',
+                //         'data-placeholder' => 'Search product by name or SKU',
+                //         'data-ajax--url' => route('products.get-my-products-for-select'),
+                //     ],
+                //     'value' => $this->getModel()->product_group_id,
+                // ]);
+
+                $this->add('grouped_products', \Botble\Base\Forms\Fields\SelectField::class, [
                     'label' => 'Product Group',
                     'label_attr' => ['class' => 'control-label'],
                     'choices' => [],
-                    'empty_value' => '— Select group product —',
+                    'empty_value' => '— Select products —',
                     'attr' => [
                         'class' => 'form-control select2-select',
                         'data-placeholder' => 'Search product by name or SKU',
                         'data-ajax--url' => route('products.get-my-products-for-select'),
+                        'multiple' => 'multiple', // <-- enable multi-select
                     ],
-                    'value' => $this->getModel()->product_group_id,
+                    'value' => $this->getSelectedGroupProducts(),
                 ]);
+
+
+
+
+
 
 
                 $attributeSets = ProductAttributeSet::query()
@@ -178,7 +197,7 @@ class ProductForm extends FormAbstract
                             'choices' => $choices,
                             'empty_value' => '— Select ' . $set->title . ' —',
                             'attr' => ['class' => 'form-control select2-select'],
-                            'value' => $savedValue,
+                            'selected' => $savedValue,
                         ]
                     );
 
@@ -434,4 +453,18 @@ class ProductForm extends FormAbstract
             ->addStylesDirectly('vendor/core/plugins/ecommerce/css/ecommerce.css')
             ->addScriptsDirectly('vendor/core/plugins/ecommerce/js/edit-product.js');
     }
+
+    protected function getSelectedGroupProducts(): array
+{
+    $model = $this->getModel();
+
+    if ($model->product_group_id) {
+        return Product::where('product_group_id', $model->product_group_id)
+            ->pluck('id')
+            ->toArray();
+    }
+
+    return [];
+}
+
 }

@@ -131,17 +131,35 @@ class ProductController extends BaseController
             );
         }
 
-        if ($request->has('grouped_products')) {
-            GroupedProduct::createGroupedProducts(
-                $product->getKey(),
-                array_map(function ($item) {
-                    return [
-                        'id' => $item,
-                        'qty' => 1,
-                    ];
-                }, array_filter(explode(',', $request->input('grouped_products', ''))))
-            );
+        $groupedProducts = $request->input('grouped_products', []);
+
+        if (is_string($groupedProducts)) {
+            $groupedProducts = explode(',', $groupedProducts);
+        } elseif (!is_array($groupedProducts)) {
+            $groupedProducts = [];
         }
+
+        if (!in_array($product->getKey(), $groupedProducts)) {
+            $groupedProducts[] = $product->getKey();
+        }
+
+        $groupId = $product->getKey();
+
+        foreach ($groupedProducts as $productId) {
+            $p = Product::with('productAttributeSets.attributes')->find($productId);
+            if (!$p) continue;
+
+            $p->product_group_id = $groupId;
+
+            if ($p->getKey() == $product->getKey()) {
+                $p->group_attributes = $request->input('group_attributes', []);
+            } else {
+                $p->group_attributes = $p->group_attributes ?? [];
+            }
+
+            $p->save();
+        }
+
 
         return $this
             ->httpResponse()
@@ -204,17 +222,37 @@ class ProductController extends BaseController
             $product->productAttributeSets()->detach();
         }
 
-        if ($request->has('grouped_products')) {
-            GroupedProduct::createGroupedProducts(
-                $product->getKey(),
-                array_map(function ($item) {
-                    return [
-                        'id' => $item,
-                        'qty' => 1,
-                    ];
-                }, array_filter(explode(',', $request->input('grouped_products', ''))))
-            );
+        $groupedProducts = $request->input('grouped_products', []);
+
+
+        if (is_string($groupedProducts)) {
+            $groupedProducts = explode(',', $groupedProducts);
+        } elseif (!is_array($groupedProducts)) {
+            $groupedProducts = [];
         }
+
+
+        if (!in_array($product->getKey(), $groupedProducts)) {
+            $groupedProducts[] = $product->getKey();
+        }
+
+        $groupId = $product->getKey();
+
+        foreach ($groupedProducts as $productId) {
+            $p = Product::with('productAttributeSets.attributes')->find($productId);
+            if (!$p) continue;
+
+            $p->product_group_id = $groupId;
+
+            if ($p->getKey() == $product->getKey()) {
+                $p->group_attributes = $request->input('group_attributes', []);
+            } else {
+                $p->group_attributes = $p->group_attributes ?? [];
+            }
+
+            $p->save();
+        }
+
 
         $relatedProductIds = $product->variations()->pluck('product_id')->all();
 
