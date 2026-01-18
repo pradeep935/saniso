@@ -443,32 +443,33 @@ class ProductForm extends FormAbstract
             ->addScriptsDirectly('vendor/core/plugins/ecommerce/js/edit-product.js');
     }
 
-    protected function getSelectedGroupProducts(): array
-{
-    $model = $this->getModel();
+    protected function getSelectedGroupProducts(): array{
+        $model = $this->getModel();
 
-    if ($model->product_group_id) {
-        return Product::where('product_group_id', $model->product_group_id)
-            ->pluck('id')
-            ->toArray();
-    }
+        if ($model->product_group_id) {
+            return Product::where('product_group_id', $model->product_group_id)
+                ->pluck('id')
+                ->toArray();
+        }
 
-    return [];
-}
-
-protected function getGroupedProductChoices(): array
-{
-    $ids = $this->getSelectedGroupProducts();
-
-    if (empty($ids)) {
         return [];
     }
 
-    return \Botble\Ecommerce\Models\Product::query()
+    protected function getGroupedProductChoices(): array{
+        $ids = $this->getSelectedGroupProducts();
+
+        if (empty($ids)) {
+            return [];
+        }
+
+        return \Botble\Ecommerce\Models\Product::query()
         ->whereIn('id', $ids)
-        ->pluck('name', 'id')
+        ->get()
+        ->mapWithKeys(function ($p) {
+            return [$p->id => "{$p->name} ({$p->sku})"];
+        })
         ->toArray();
-}
+    }
 
 
 }

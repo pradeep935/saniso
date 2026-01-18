@@ -1073,23 +1073,26 @@ class Product extends BaseModel
         ->get();
     }
 
+
     public function groupOptions(): array{
         $products = $this->groupProducts();
-
         if ($products->isEmpty()) {
             return [];
         }
 
         $options = [];
+        $combinations = [];
 
         foreach ($products as $product) {
+
+            $keyParts = [];
+
             foreach ($product->group_attributes ?? [] as $setId => $attrId) {
 
                 $attr = DB::table('ec_product_attributes as a')
                     ->join('ec_product_attribute_sets as s', 's.id', '=', 'a.attribute_set_id')
                     ->where('a.id', $attrId)
                     ->select(
-                        's.id as set_id',
                         's.title as set_name',
                         'a.id as attribute_id',
                         'a.title as attribute_name',
@@ -1097,23 +1100,27 @@ class Product extends BaseModel
                     )
                     ->first();
 
-                if (! $attr) {
-                    continue;
-                }
+                if (! $attr) continue;
 
                 $setKey = Str::slug($attr->set_name);
 
-                if (! isset($options[$setKey][$attr->attribute_id])) {
-                    $options[$setKey][$attr->attribute_id] = [
-                        'label' => $attr->attribute_name,
-                        'color' => $attr->color ?? null,
-                        'url'   => $product->url,
-                    ];
-                }
+                $options[$setKey][$attr->attribute_id] = [
+                    'label' => $attr->attribute_name,
+                    'color' => $attr->color ?? null,
+                ];
+
+                $keyParts[$setKey] = $attr->attribute_id;
+            }
+
+            if (count($keyParts)) {
+                ksort($keyParts);
+                $comboKey = implode('_', $keyParts);
+                $combinations[$comboKey] = $product->url;
             }
         }
 
-        return compact('options');
+        return compact('options', 'combinations');
     }
+
 
 }

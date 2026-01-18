@@ -63,6 +63,13 @@ app()->booted(function (): void {
         EcommerceHelper::registerProductVideo();
         EcommerceHelper::registerProductGalleryOptions();
         EcommerceHelper::registerThemeAssets();
+        Theme::asset()
+    ->container('footer')
+    ->add(
+        'saniso-custom-js',
+        asset('themes/saniso/js/custom.js')
+    );
+
     }
 
     Theme::typography()

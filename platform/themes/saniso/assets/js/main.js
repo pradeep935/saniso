@@ -1601,3 +1601,4 @@ MartApp.isRTL = $('body').prop('dir') === 'rtl'
         })
     })
 })(jQuery)
+
