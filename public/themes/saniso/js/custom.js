@@ -1,94 +1,79 @@
 document.addEventListener('DOMContentLoaded', function () {
 
     const combos = window.PRODUCT_COMBINATIONS || {};
-    const CURRENT_COLOR_ID = window.CURRENT_COLOR_ID;
-    const CURRENT_SIZE_ID  = window.CURRENT_SIZE_ID;
+    const allBtns = document.querySelectorAll('.variation-btn');
+    const groups  = document.querySelectorAll('.variation-group');
 
-    let selected = { color: null, size: null };
-
-    const colorBtns = document.querySelectorAll('.color-btn');
-    const sizeBtns  = document.querySelectorAll('.size-btn');
-
-    function buildKey(colorId, sizeId) {
-        return String(colorId) + '_' + String(sizeId);
-    }
-
-    function filterSizesByColor(colorId) {
-        sizeBtns.forEach(btn => {
-            const key = buildKey(colorId, btn.dataset.id);
-            if (combos.hasOwnProperty(key)) {
-                btn.classList.add('valid');
-                btn.classList.remove('invalid', 'selected', 'disabled');
-            } else {
-                btn.classList.add('invalid', 'disabled');
-                btn.classList.remove('valid', 'selected');
-            }
-        });
-    }
-
-    function autoSelectSize(colorId) {
-        let selectedSize = null;
-
-        if (CURRENT_SIZE_ID && combos.hasOwnProperty(buildKey(colorId, CURRENT_SIZE_ID))) {
-            selectedSize = CURRENT_SIZE_ID;
-        } else {
-            for (let btn of sizeBtns) {
-                const key = buildKey(colorId, btn.dataset.id);
-                if (combos.hasOwnProperty(key)) {
-                    selectedSize = btn.dataset.id;
-                    break;
-                }
-            }
-        }
-
-        if (selectedSize) {
-            selected.size = selectedSize;
-            sizeBtns.forEach(btn => btn.classList.remove('selected'));
-            const sizeBtn = document.querySelector('.size-btn[data-id="' + selectedSize + '"]');
-            if (sizeBtn) sizeBtn.classList.add('selected');
-        }
-    }
-
-    /* ===== INIT ===== */
-    colorBtns.forEach(b => b.classList.remove('active'));
-    sizeBtns.forEach(b => b.classList.remove('active', 'disabled', 'valid', 'invalid', 'selected'));
-
-    if (CURRENT_COLOR_ID) {
-        selected.color = CURRENT_COLOR_ID;
-        const colorBtn = document.querySelector('.color-btn[data-id="' + CURRENT_COLOR_ID + '"]');
-        if (colorBtn) colorBtn.classList.add('active');
-
-        filterSizesByColor(selected.color);
-        autoSelectSize(selected.color);
-    }
-
-    /* ===== COLOR CLICK ===== */
-    colorBtns.forEach(btn => {
-        btn.addEventListener('click', function () {
-            selected.color = this.dataset.id;
-            selected.size = null;
-
-            colorBtns.forEach(b => b.classList.remove('active'));
-            sizeBtns.forEach(b => b.classList.remove('active', 'selected'));
-
-            this.classList.add('active');
-
-            filterSizesByColor(selected.color);
-            autoSelectSize(selected.color);
-        });
+    let selected = {};
+    groups.forEach(g => {
+        const set = g.dataset.set;
+        selected[set] = null;
     });
 
-    /* ===== SIZE CLICK ===== */
-    sizeBtns.forEach(btn => {
-        btn.addEventListener('click', function () {
+    if (window.CURRENT_COLOR_ID) selected['color'] = String(window.CURRENT_COLOR_ID);
+    if (window.CURRENT_SIZE_ID) selected['size']  = String(window.CURRENT_SIZE_ID);
+
+    if (Object.values(selected).some(v => v === null)) {
+        const firstKey = Object.keys(combos)[0];
+        const ids = firstKey.split('_');
+        let index = 0;
+        groups.forEach(g => {
+            const set = g.dataset.set;
+            if (!selected[set]) selected[set] = ids[index] ?? null;
+            index++;
+        });
+    }
+
+    function refreshUI() {
+        allBtns.forEach(btn => {
+            const set = btn.dataset.set;
+            const id  = btn.dataset.id;
+
+            const testState = {...selected, [set]: id};
+            const key = [...groups].map(g => testState[g.dataset.set]).filter(v => v != null).join('_');
+            const exists = combos.hasOwnProperty(key);
+
+            if (groups.length > 1) {
+                if (set === 'color') {
+                    btn.classList.remove('disabled');
+                } else {
+                    btn.classList.toggle('disabled', !exists);
+                }
+            } else {
+                btn.classList.toggle('disabled', !exists);
+            }
+
+            btn.classList.toggle('valid', exists);
+            btn.classList.toggle('invalid', !exists);
+
+            if (selected[set] === id) {
+                btn.classList.add('selected','active');
+            } else {
+                btn.classList.remove('selected','active');
+            }
+        });
+    }
+
+    refreshUI();
+
+    allBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const set = btn.dataset.set;
+            const id  = btn.dataset.id;
+
             if (btn.classList.contains('disabled')) return;
 
-            selected.size = btn.dataset.id;
-            sizeBtns.forEach(b => b.classList.remove('selected'));
-            btn.classList.add('selected');
+            if (set === 'color' && groups.length > 1) {
+                selected[set] = id;
+                refreshUI();
+                return;
+            }
 
-            const key = buildKey(selected.color, selected.size);
-            if (combos.hasOwnProperty(key) && window.location.href !== combos[key]) {
+            selected[set] = id;
+            refreshUI();
+
+            const key = [...groups].map(g => selected[g.dataset.set]).filter(v => v != null).join('_');
+            if (combos[key] && window.location.href !== combos[key]) {
                 window.location.href = combos[key];
             }
         });

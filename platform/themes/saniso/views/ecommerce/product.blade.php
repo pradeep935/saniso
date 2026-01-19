@@ -10,6 +10,7 @@
 @php
     $groupData = $product->groupOptions();
 
+    // current selections (optional for initial load)
     $currentColorId = null;
     $currentSizeId  = null;
 
@@ -415,38 +416,39 @@
                             {!! apply_filters('ecommerce_after_product_description', null, $product) !!}
                         </div>
 
-                        <div class="product-variations mb-4">
-                            @if(!empty($groupData['options']))
-                                @foreach($groupData['options'] as $setName => $attributes)
-                                    @php
-                                        $isColor = ($setName === 'color');
-                                        $isSize  = in_array($setName, ['size','sizes','t-shirt-size']);
-                                    @endphp
-                                    <div class="variation-group mb-3">
-                                        <label class="form-label fw-semibold">
-                                            {{ ucfirst(str_replace('-', ' ', $setName)) }}
-                                        </label>
 
-                                        <div class="d-flex flex-wrap gap-2 {{ $isColor ? 'color-swatches' : 'size-pills' }}">
-                                            @foreach($attributes as $id => $attr)
-                                                <a href="javascript:void(0)"
-                                                   class="variation-btn {{ $setName }}-btn {{ $isColor ? 'color-btn' : 'size-btn' }}"
-                                                   data-set="{{ $setName }}"
-                                                   data-id="{{ $id }}"
-                                                   @if($isColor)
-                                                       style="background-color: {{ $attr['color'] ?? '#000' }}"
-                                                   @endif
-                                                   title="{{ $attr['label'] }}">
-                                                    @if(!$isColor)
-                                                        {{ $attr['label'] }}
-                                                    @endif
-                                                </a>
-                                            @endforeach
-                                        </div>
-                                    </div>
-                                @endforeach
+<div class="product-variations mb-4">
+    @if(!empty($groupData['options']))
+        @foreach($groupData['options'] as $setName => $attributes)
+            @php
+                $isColor = ($setName === 'color');
+                $isSize  = in_array($setName, ['size','sizes','t-shirt-size']);
+            @endphp
+            <div class="variation-group mb-3" data-set="{{ $setName }}">
+                <label class="form-label fw-semibold">
+                    {{ ucfirst(str_replace('-', ' ', $setName)) }}
+                </label>
+
+                <div class="d-flex flex-wrap gap-2 {{ $isColor ? 'color-swatches' : 'size-pills' }}">
+                    @foreach($attributes as $id => $attr)
+                        <a href="javascript:void(0)"
+                           class="variation-btn {{ $setName }}-btn {{ $isColor ? 'color-btn' : 'size-btn' }}"
+                           data-set="{{ $setName }}"
+                           data-id="{{ $id }}"
+                           @if($isColor)
+                               style="background-color: {{ $attr['color'] ?? '#000' }}"
+                           @endif
+                           title="{{ $attr['label'] }}">
+                            @if(!$isColor)
+                                {{ $attr['label'] }}
                             @endif
-                        </div>
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+        @endforeach
+    @endif
+</div>
 
                         {!! Theme::partial('ecommerce.product-availability', compact('product', 'productVariation')) !!}
                         @if (Botble\Ecommerce\Facades\FlashSale::isEnabled() && ($flashSale = $product->latestFlashSales()->first()))
