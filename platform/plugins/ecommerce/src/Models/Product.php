@@ -1122,5 +1122,4 @@ class Product extends BaseModel
         return compact('options', 'combinations');
     }
 
-
 }

@@ -57,6 +57,9 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Mail;
+use Botble\Media\Facades\RvMedia;
 
 class OrderController extends BaseController
 {
@@ -1331,4 +1334,40 @@ class OrderController extends BaseController
 
         return $storage->download($order->proof_file);
     }
+
+    public function supplierList(Order $order, Request $request){
+        $logo = get_ecommerce_setting('company_logo_for_invoicing') 
+            ?: (theme_option('logo_in_invoices') ?: Theme::getLogo());
+
+        $logoUrl = null;
+        if ($logo) {
+            $cleanLogo = ltrim($logo, './');
+            $logoUrl = RvMedia::getImageUrl($cleanLogo, null, false, RvMedia::getDefaultImage());
+        }
+
+        $order->load(['products', 'products.product']);
+
+        $order->products->transform(function ($item) {
+            $item->product_options = is_string($item->product_options) 
+                ? json_decode($item->product_options, true) 
+                : $item->product_options;
+            return $item;
+        });
+
+        $data = [
+            'order' => $order,
+            'logoUrl' => $logoUrl,
+        ];
+
+        if ($request->input('type') == 'print') {
+            return Pdf::loadView('plugins/ecommerce::orders.supplier-list', $data)
+                ->setOptions(['isRemoteEnabled' => true])
+                ->stream('supplier_list_' . $order->code . '.pdf');
+        }
+
+        return Pdf::loadView('plugins/ecommerce::orders.supplier-list', $data)
+            ->setOptions(['isRemoteEnabled' => true])
+            ->download('supplier_list_' . $order->code . '.pdf');
+    }
+
 }

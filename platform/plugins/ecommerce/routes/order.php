@@ -16,6 +16,18 @@ AdminHelper::registerRoutes(function (): void {
                 'permission' => 'orders.create',
             ]);
 
+            Route::get('{order}/supplier-list', [
+                'as' => 'orders.supplier-list',
+                'uses' => 'OrderController@supplierList',
+                'permission' => 'orders.edit',
+            ]);
+
+            Route::get('{order}/supplier-list', [
+                'as' => 'supplier-list',
+                'uses' => 'OrderController@supplierList',
+                'permission' => 'orders.edit',
+            ]);
+
             Route::get('generate-invoice/{order}', [
                 'as' => 'generate-invoice',
                 'uses' => 'OrderController@getGenerateInvoice',

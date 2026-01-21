@@ -78,6 +78,27 @@
                                     @endif
                                 </div>
 
+                                <x-core::button
+                                    tag="a"
+                                    href="{{ route('orders.supplier-list', $order->id) }}?type=print"
+                                    target="_blank"
+                                    color="primary"
+                                    icon="ti ti-printer"
+                                >
+                                    Supplier List
+                                </x-core::button>
+
+                                <x-core::button
+                                    tag="a"
+                                    target="_blank"
+                                    color="primary"
+                                    href="{{ route('orders.supplier-list', $order->id) }}"
+                                    icon="ti ti-download"
+                                >
+                                     Supplier List
+                                </x-core::button>
+
+
                                 @include('plugins/ecommerce::orders.edit.form-edit', ['route' => 'orders.edit'])
                             </div>
                         </div>

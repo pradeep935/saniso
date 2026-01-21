@@ -45,6 +45,10 @@ class OrderTable extends TableAbstract
             ->addActions([
                 EditAction::make()->route('orders.edit'),
                 DeleteAction::make()->route('orders.destroy'),
+                // EditAction::make('supplier-list')
+                // ->label('Supplier List')
+                // ->icon('ti ti-list')
+                // ->route('orders.supplier-list'),
             ]);
     }
 
