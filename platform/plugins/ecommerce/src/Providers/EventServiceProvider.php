@@ -111,6 +111,7 @@ class EventServiceProvider extends ServiceProvider
             GenerateLicenseCodeAfterOrderCompleted::class,
             UpdateInvoiceWhenOrderCompleted::class,
             SendWebhookWhenOrderCompleted::class,
+            SendSupplierOrderPdfAfterOrderCompleted::class,
         ],
         ProductViewed::class => [
             UpdateProductView::class,
