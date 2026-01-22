@@ -41,6 +41,7 @@ use Botble\Ecommerce\Listeners\SendShippingStatusChangedNotification;
 use Botble\Ecommerce\Listeners\SendWebhookWhenCartAbandoned;
 use Botble\Ecommerce\Listeners\SendWebhookWhenOrderCancelled;
 use Botble\Ecommerce\Listeners\SendWebhookWhenOrderCompleted;
+use Botble\Ecommerce\Listeners\SendSupplierOrderPdfAfterOrderCompleted;
 use Botble\Ecommerce\Listeners\SendWebhookWhenOrderPlaced;
 use Botble\Ecommerce\Listeners\SendWebhookWhenOrderUpdated;
 use Botble\Ecommerce\Listeners\SendWebhookWhenPaymentStatusUpdated;

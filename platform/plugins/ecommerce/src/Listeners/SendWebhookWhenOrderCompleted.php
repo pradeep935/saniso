@@ -15,7 +15,7 @@ class SendWebhookWhenOrderCompleted
         $webhookURL = get_ecommerce_setting('order_completed_webhook_url');
 
         if (! $webhookURL || ! URL::isValidUrl($webhookURL) || BaseHelper::hasDemoModeEnabled()) {
-            return;
+            return; 
         }
 
         try {
