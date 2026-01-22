@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Mail;
 use Botble\Theme\Facades\Theme;
 use RvMedia;
 
-class SendSupplierOrderPdfAfterOrderCompleted
+class SendSupplierOrderPdfAfterOrderCompleted implements ShouldQueue
 {
     public function handle(OrderCompletedEvent $event): void
     {
