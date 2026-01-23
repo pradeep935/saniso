@@ -2,7 +2,7 @@
 
 namespace Botble\Ecommerce\Listeners;
 
-use Botble\Ecommerce\Events\OrderCompletedEvent;
+use Botble\Ecommerce\Events\OrderPaymentConfirmedEvent;
 use Botble\Ecommerce\Models\Order;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -12,7 +12,7 @@ use RvMedia;
 
 class SendSupplierOrderPdfAfterOrderCompleted implements ShouldQueue
 {
-    public function handle(OrderCompletedEvent $event): void
+    public function handle(OrderPaymentConfirmedEvent $event): void
     {
         $order = $event->order;
 
