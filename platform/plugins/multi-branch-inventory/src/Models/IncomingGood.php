@@ -80,10 +80,11 @@ class IncomingGood extends BaseModel
 
     public static function AllStatus(){
         $statuses = [
-            'draft'      => 'Draft',
-            'received'   => 'Received',
-            'processed'  => 'Processed',
-            'backorder'  => 'Backorder',
+            'draft' => 'Draft',
+            'received' => 'Received',
+            'processed' => 'Processed',
+            'backorder' => 'Backorder',
+            'pending' => 'Pending',
         ];
 
         return $statuses;

@@ -70,7 +70,9 @@ class IncomingGoodsController extends BaseController
     {
         // Validate items and ensure product_name is present
         // Received date is only required for statuses 'received' and 'backorder'
-        $receivingDateRule = in_array($request->status, ['received', 'backorder']) ? 'required|date' : 'nullable|date';
+
+        $receivingDateRule = $request->status === 'pending' ? 'nullable|date' : 'required|date';
+
 
         $request->validate([
             'branch_id' => 'required|exists:mbi_branches,id',

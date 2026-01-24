@@ -565,9 +565,9 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label class="required">{{ trans('Receiving Date') }}</label>
+                                <label>{{ trans('Receiving Date') }}</label>
                                 <input type="date" name="receiving_date" class="form-control" 
-                                       value="{{ old('receiving_date', date('Y-m-d')) }}" required>
+                                       value="{{ old('receiving_date') }}">
                                 @error('receiving_date')
                                     <small class="form-text text-danger">{{ $message }}</small>
                                 @enderror
@@ -833,7 +833,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const loading = document.getElementById('supplier_loading');
 
     let timeout = null;
-    let controller = null; // 👈 important
+    let controller = null;
 
     function showLoading() {
         loading.classList.remove('d-none');
@@ -854,7 +854,6 @@ document.addEventListener('DOMContentLoaded', function () {
         if (query.length < 2) return;
 
         timeout = setTimeout(() => {
-            // ❌ cancel previous request
             if (controller) {
                 controller.abort();
             }
@@ -896,7 +895,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 suggestions.classList.remove('d-none');
             })
             .catch(err => {
-                // Ignore abort errors
                 if (err.name !== 'AbortError') {
                     console.error(err);
                 }
@@ -915,6 +913,23 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const statusField = document.getElementById('status');
+    const receivingDate = document.getElementById('receiving_date');
+
+    function toggleReceivingDate() {
+        if (statusField.value === 'pending') {
+            receivingDate.removeAttribute('required');
+        } else {
+            receivingDate.setAttribute('required', 'required');
+        }
+    }
+
+    toggleReceivingDate(); // on page load
+    statusField.addEventListener('change', toggleReceivingDate);
+});
+</script>
 
 
 
@@ -1182,14 +1197,44 @@ document.addEventListener('DOMContentLoaded', function () {
                             addProductToList(response.product, code);
                             showNotification('success', '✓ {{ trans('Product found and added!') }}');
                         } else {
-                            // ❌ Product NOT found - show "not available" message
                             showNotification('warning', '⚠ {{ trans('Product not available in catalog') }}');
-                            
-                            // Add as temporary incoming goods
-                            addTemporaryProduct(code);
+
+                            const createNew = confirm(
+                                "{{ trans('Product not found. Do you want to create a new good?') }}"
+                            );
+
+                            if (createNew) {
+                                $.ajax({
+                                    url: "{{ route('temporary-products.store') }}",
+                                    method: "POST",
+                                    data: {
+                                        branch_id: 1,
+                                        name: code,
+                                        quantity: 1,
+                                        ean: code,
+                                        _token: "{{ csrf_token() }}"
+                                    },
+                                    success: function (res) {
+                                        showNotification('success', '✓ ' + res.message);
+
+                                        // optional: add to list immediately
+                                        // addProductToList(res.product, code);
+                                    },
+                                    error: function (xhr) {
+                                        if (xhr.status === 422) {
+                                            // Laravel validation error
+                                            const errors = xhr.responseJSON.errors;
+                                            const firstError = Object.values(errors)[0][0];
+                                            showNotification('error', firstError);
+                                        } else {
+                                            showNotification('error', 'Something went wrong');
+                                        }
+                                    }
+                                });
+                            }
+
                         }
                         
-                        // Clear input and refocus
                         $('#barcode-input').val('').focus();
                     },
                     error: function() {

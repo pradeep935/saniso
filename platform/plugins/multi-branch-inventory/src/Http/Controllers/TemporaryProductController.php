@@ -103,6 +103,14 @@ class TemporaryProductController extends BaseController
             'notes' => $request->notes,
         ]);
 
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'product' => $temporaryProduct,
+                'message' => 'Temporary product created successfully!',
+            ]);
+        }
+
         return redirect()
             ->route('temporary-products.index')
             ->with('success', 'Temporary product created successfully!');

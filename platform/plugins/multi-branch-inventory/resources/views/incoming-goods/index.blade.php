@@ -486,10 +486,10 @@
                                         </a>
                                         
                                         @if($goods->status === 'pending')
-                                            <a href="{{ route('incoming-goods.edit', $goods->id) }}" 
+                                            <!-- <a href="{{ route('incoming-goods.edit', $goods->id) }}" 
                                                class="btn-action btn-edit" title="{{ trans('Edit') }}">
                                                 <i class="fa fa-edit"></i> Edit
-                                            </a>
+                                            </a> -->
                                             <form method="POST" action="{{ route('incoming-goods.process', $goods->id) }}" style="display: inline;">
                                                 @csrf
                                                 <button type="submit" class="btn-action btn-success-small" title="{{ trans('Mark as Received') }}"
