@@ -9,6 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Mail;
 use Botble\Theme\Facades\Theme;
 use RvMedia;
+use Carbon\Carbon;
 
 class SendSupplierOrderPdfAfterOrderCompleted implements ShouldQueue
 {
@@ -26,53 +27,68 @@ class SendSupplierOrderPdfAfterOrderCompleted implements ShouldQueue
             'products.product.brand',
         ]);
 
-        // $supplierEmail = optional(
-        //     optional($order->products->first()->product)->brand
-        // )->supplier_email;
 
-        // if (! $supplierEmail) {
-        //     return;
-        // }
+        $supplierEmail = optional(
+            optional($order->products->first()->product)->brand
+        )->supplier_email;
 
-        $supplierEmail = 'devs.pradeep@gmail.com';
+        $fallbackEmail = 'order@saniso.nl';
+
+        // $toEmail = $supplierEmail ?: $fallbackEmail;
+        $toEmail = "pradeepkumar199215pk@gmail.com";
 
         $logo = get_ecommerce_setting('company_logo_for_invoicing')
             ?: (theme_option('logo_in_invoices') ?: Theme::getLogo());
 
-        $logoUrl = $logo
-            ? RvMedia::getImageUrl(ltrim($logo, './'))
-            : null;
+        $logoUrl = $logo ? RvMedia::getImageUrl(ltrim($logo, './')) : null;
 
         $order->products->transform(function ($item) {
-            $item->product_options = is_string($item->product_options)
-                ? json_decode($item->product_options, true)
-                : $item->product_options;
+            $item->product_options = is_string($item->product_options) ? json_decode($item->product_options, true) : $item->product_options;
             return $item;
         });
 
+
         $pdf = Pdf::loadView(
-            'plugins/ecommerce::orders.supplier-list',
-            [
-                'order' => $order,
-                'logoUrl'=> $logoUrl,
+            'plugins/ecommerce::orders.supplier-list',[
+                'order'   => $order,
+                'logoUrl' => $logoUrl,
             ]
         )->setOptions([
             'isRemoteEnabled' => true,
         ]);
 
-        // $cc = 'order@saniso.nl';
-        $cc = 'pradeepkumar199215pk@gmail.com';
+        $orderDateTime = Carbon::parse($order->created_at)->format('d-m-Y H:i');
+        $orderStatus   = ucfirst($order->status);
 
-        Mail::send([], [], function ($message) use ($pdf, $order, $supplierEmail,$cc) {
+        $emailBody = <<<EOT
+        Hello,
+
+        Please find attached the supplier order PDF.
+
+        Order details:
+        - Order ID: {$order->code}
+        - Order Date: {$orderDateTime}
+        - Order Status: {$orderStatus}
+
+        Best regards,
+        Saniso
+        EOT;
+
+
+        Mail::send([], [], function ($message) use ($pdf, $order, $toEmail, $supplierEmail, $emailBody) {
             $message
-                ->to($supplierEmail)
-                ->cc($cc)
+                ->to($toEmail)
                 ->subject('New Supplier Order - ' . $order->code)
+                ->setBody(nl2br($emailBody), 'text/html')
                 ->attachData(
                     $pdf->output(),
                     'supplier_order_' . $order->code . '.pdf',
                     ['mime' => 'application/pdf']
                 );
+
+            if ($supplierEmail) {
+                $message->cc('order@saniso.nl');
+            }
         });
     }
 }
