@@ -78,6 +78,17 @@ class IncomingGood extends BaseModel
         return $this->save();
     }
 
+    public static function AllStatus(){
+        $statuses = [
+            'draft'      => 'Draft',
+            'received'   => 'Received',
+            'processed'  => 'Processed',
+            'backorder'  => 'Backorder',
+        ];
+
+        return $statuses;
+    }
+
     /**
      * Calculate total value
      */

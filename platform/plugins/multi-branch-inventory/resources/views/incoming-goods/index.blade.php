@@ -337,9 +337,28 @@
     <div class="container-fluid">
         <!-- Filter Card -->
         <div class="filter-card">
-            <h5><i class="fa fa-filter"></i> {{ trans('Search & Filter') }}</h5>
-            <form method="GET" class="filter-form">
+            <!-- <h5><i class="fa fa-filter"></i> {{ trans('Search & Filter') }}</h5> -->
+            <!-- <form method="GET" class="filter-form">
                 <div class="filter-row">
+
+
+                <ul class="nav nav-tabs mb-3">
+                    @foreach ($allStatus as $key => $label)
+                        <li class="nav-item">
+                            <a
+                                class="nav-link {{ $currentStatus === $key ? 'active' : '' }}"
+                                href="{{ route('incoming-goods.index', array_merge(request()->all(), ['status' => $key])) }}"
+                            >
+                                {{ $label }}
+                            </a>
+                        </li>
+                    @endforeach
+                </ul>
+
+
+
+
+
                     <div class="filter-group">
                         <label for="branch_id">{{ trans('Branch') }}</label>
                         <select name="branch_id" id="branch_id">
@@ -382,6 +401,24 @@
                             <i class="fa fa-refresh"></i> {{ trans('Reset') }}
                         </a>
                     </div>
+                </div>
+            </form> -->
+
+            <form method="GET" class="filter-form">
+                <div class="filter-row">
+
+                    <ul class="nav nav-tabs mb-3">
+                        @foreach ($allStatus as $key => $label)
+                            <li class="nav-item">
+                                <a
+                                    class="nav-link {{ $currentStatus === $key ? 'active' : '' }}"
+                                    href="{{ route('incoming-goods.index', array_merge(request()->all(), ['status' => $key])) }}"
+                                >
+                                    {{ $label }}
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
                 </div>
             </form>
         </div>

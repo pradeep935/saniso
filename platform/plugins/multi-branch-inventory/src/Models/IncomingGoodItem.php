@@ -23,11 +23,13 @@ class IncomingGoodItem extends BaseModel
         'condition_notes',
         'photos',
         'is_new_product',
+        'internal_use',
     ];
 
     protected $casts = [
         'photos' => 'array',
         'is_new_product' => 'boolean',
+        'internal_use' => 'boolean',
     ];
 
     /**

@@ -7,6 +7,7 @@ use Botble\MultiBranchInventory\Models\IncomingGood;
 use Botble\MultiBranchInventory\Models\IncomingGoodItem;
 use Botble\MultiBranchInventory\Models\Branch;
 use Botble\Ecommerce\Models\Product;
+use Botble\Ecommerce\Models\Customer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -18,8 +19,14 @@ class IncomingGoodsController extends BaseController
      */
     public function index(Request $request)
     {
+        if (! $request->has('status')) {
+            return redirect()->route('incoming-goods.index', ['status' => 'draft']);
+        }
+
         $branches = Branch::where('status', 'active')->get();
-        
+        $allStatus = IncomingGood::AllStatus();
+        $currentStatus = $request->status ? $request->status : 'draft';
+
         $query = IncomingGood::with(['branch', 'items'])
             ->orderBy('receiving_date', 'desc');
 
@@ -27,9 +34,7 @@ class IncomingGoodsController extends BaseController
             $query->where('branch_id', $request->branch_id);
         }
 
-        if ($request->status) {
-            $query->where('status', $request->status);
-        }
+        $query->where('status', $currentStatus);
 
         if ($request->date_from) {
             $query->whereDate('receiving_date', '>=', $request->date_from);
@@ -41,7 +46,7 @@ class IncomingGoodsController extends BaseController
 
         $incomingGoods = $query->paginate(20);
 
-        return view('plugins/multi-branch-inventory::incoming-goods.index', compact('incomingGoods', 'branches'));
+        return view('plugins/multi-branch-inventory::incoming-goods.index', compact('incomingGoods', 'branches', 'allStatus','currentStatus'));
     }
 
     /**
@@ -53,8 +58,9 @@ class IncomingGoodsController extends BaseController
         
         $branches = Branch::where('status', 'active')->get();
         // Don't load all products - use AJAX search instead for better performance with 11K+ products
+        $allStatus = IncomingGood::AllStatus();
         
-        return view('plugins/multi-branch-inventory::incoming-goods.create', compact('branches'));
+        return view('plugins/multi-branch-inventory::incoming-goods.create', compact('branches','allStatus'));
     }
 
     /**
@@ -102,7 +108,7 @@ class IncomingGoodsController extends BaseController
                 'supplier_name' => $request->supplier_name,
                 'receiving_date' => $request->receiving_date,
                 'reference_number' => $referenceNumber,
-                'status' => 'received',
+                'status' => $request->status,
                 'notes' => $request->notes,
                 'received_by' => Auth::id(),
                 'total_items' => array_sum(array_map(function($it){ return intval($it['quantity_received'] ?? 0); }, $request->items)),
@@ -148,6 +154,9 @@ class IncomingGoodsController extends BaseController
                 $isNew = !empty($itemData['is_new_product']) && $itemData['is_new_product'] == 1;
                 $productId = $itemData['product_id'] ?? null;
 
+                $internalUse = (int) ($itemData['internal_use'] ?? 0);
+
+
                 // If this is a temporary/new product (no product_id), persist a TemporaryProduct record
                 if ($isNew && !$productId) {
                     $temp = \Botble\MultiBranchInventory\Models\TemporaryProduct::create([
@@ -175,16 +184,18 @@ class IncomingGoodsController extends BaseController
                     'ean' => $itemData['ean'] ?? null,
                     'sku' => $itemData['sku'] ?? null,
                     'is_new_product' => $isNew ? 1 : 0,
+                    'internal_use' => $internalUse,
                 ]);
 
                 // Automatically process to inventory when a real product is linked
-                if ($item->product_id && $quantity > 0) {
+                if ($item->product_id && $quantity > 0 && !$internalUse) {
                     $item->processToInventory();
                 }
+
             }
 
             $incomingGood->update([
-                'status' => 'processed',
+                'status' => $request->status,
                 'processed_at' => now(),
                 'processed_by' => Auth::id(),
             ]);
@@ -248,19 +259,22 @@ class IncomingGoodsController extends BaseController
     public function supplierSuggestions(Request $request)
     {
         $q = $request->get('q');
-        $query = IncomingGood::query();
+
+        $query = Customer::query()
+            ->where('is_vendor', 1);
+
         if ($q) {
-            $query->where('supplier_name', 'like', '%' . $q . '%');
+            $query->where('name', 'like', '%' . $q . '%');
         }
 
-        $suppliers = $query->whereNotNull('supplier_name')
-            ->groupBy('supplier_name')
-            ->select('supplier_name')
+        $suppliers = $query
+            ->whereNotNull('name')
+            ->orderBy('name')
             ->limit(10)
-            ->pluck('supplier_name');
+            ->pluck('name');
 
         return response()->json($suppliers);
-    }
+        }
 
     /**
      * Create a TemporaryProduct via AJAX from incoming goods page

@@ -14,6 +14,19 @@
         border-radius: 8px;
         box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     }
+
+    #supplier_suggestions{
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        max-height: 200px;
+        overflow-y: auto;
+        z-index: 9999;
+        background: #fff;
+        border: 1px solid #ddd;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
     
     .modern-header h1 {
         margin: 0;
@@ -486,7 +499,7 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-group">
                                 <label class="required">{{ trans('Branch') }}</label>
                                 <select name="branch_id" id="branch_id" class="form-control" required>
@@ -501,20 +514,52 @@
                                     <small class="form-text text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
+
+
                         </div>
 
-                        <div class="col-md-6">
-                            <div class="form-group" style="position:relative;">
+                        <div class="col-md-4">
+                            <div class="form-group position-relative">
                                 <label class="required">{{ trans('Supplier Name') }}</label>
-                                <input type="text" name="supplier_name" id="supplier_name" class="form-control" 
-                                       value="{{ old('supplier_name') }}" 
-                                       placeholder="e.g., ABC Wholesale Ltd." required autocomplete="off">
-                                <div id="supplier_suggestions" class="list-group mt-1 d-none" style="position: absolute; z-index: 9999; max-height: 200px; overflow:auto; width:100%;"></div>
+
+                                <input type="text" name="supplier_name" id="supplier_name" class="form-control" value="{{ old('supplier_name') }}" placeholder="Select supplier..." required autocomplete="off"
+                                >
+
+                                <div id="supplier_loading" class="small text-muted d-none mt-1">
+                                    <span class="spinner-border spinner-border-sm me-1"></span>
+                                    Loading suppliers...
+                                </div>
+
+                                <!-- Suggestions -->
+                                <div id="supplier_suggestions" class="list-group mt-1 d-none"></div>
+
                                 @error('supplier_name')
                                     <small class="form-text text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
                         </div>
+
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="required">Status</label>
+
+                                <select name="status" class="form-control" required>
+                                    <option value="">Select</option>
+                                    @foreach ($allStatus as $key => $label)
+                                        <option value="{{ $key }}"
+                                            {{ ($currentStatus ?? 'Pending') === $key ? 'selected' : '' }}>
+                                            {{ $label }}
+                                        </option>
+                                    @endforeach
+                                </select>
+
+                                @error('status')
+                                    <small class="form-text text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+                        </div>
+
                     </div>
 
                     <div class="row">
@@ -659,6 +704,7 @@
                                         <th style="width: 12%">{{ trans('Expected Qty') }}</th>
                                         <th style="width: 12%">{{ trans('Received Qty') }}</th>
                                     <th style="width: 6%;">{{ trans('Type') }}</th>
+                                    <th style="width: 6%;">Internal Use Only</th>
                                     <th style="width: 6%; text-align: center;">{{ trans('Action') }}</th>
                                 </tr>
                             </thead>
@@ -723,6 +769,13 @@
         <td style="text-align: center;">
             <span class="badge badge-primary product-type-badge">Regular</span>
         </td>
+
+        <td style="text-align: center;">
+            <input type="hidden" name="items[INDEX][internal_use]" value="0">
+            <input type="checkbox" class="form-check-input" name="items[INDEX][internal_use]" value="1">
+        </td>
+
+
         <td style="text-align: center;">
             <button type="button" class="remove-item-btn">
                 <i class="fa fa-trash"></i>
@@ -775,46 +828,95 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const supplierInput = document.getElementById('supplier_name');
+    const input = document.getElementById('supplier_name');
     const suggestions = document.getElementById('supplier_suggestions');
+    const loading = document.getElementById('supplier_loading');
 
-    if (supplierInput) {
-        let timeout = null;
-        supplierInput.addEventListener('input', function () {
-            clearTimeout(timeout);
-            const q = this.value.trim();
-            if (!q) { suggestions.classList.add('d-none'); return; }
-            timeout = setTimeout(() => {
-                fetch("{{ route('incoming-goods.api-suppliers') }}?q=" + encodeURIComponent(q))
-                    .then(r => r.json())
-                    .then(data => {
-                        suggestions.innerHTML = '';
-                        if (!data || data.length === 0) { suggestions.classList.add('d-none'); return; }
-                        data.forEach(s => {
-                            const a = document.createElement('a');
-                            a.className = 'list-group-item list-group-item-action';
-                            a.href = '#';
-                            a.textContent = s;
-                            a.addEventListener('click', function (ev) {
-                                ev.preventDefault();
-                                supplierInput.value = s;
-                                suggestions.classList.add('d-none');
-                            });
-                            suggestions.appendChild(a);
-                        });
-                        suggestions.classList.remove('d-none');
-                    });
-            }, 250);
-        });
+    let timeout = null;
+    let controller = null; // 👈 important
 
-        document.addEventListener('click', function (ev) {
-            if (!supplierInput.contains(ev.target) && !suggestions.contains(ev.target)) {
-                suggestions.classList.add('d-none');
-            }
-        });
+    function showLoading() {
+        loading.classList.remove('d-none');
     }
+
+    function hideLoading() {
+        loading.classList.add('d-none');
+    }
+
+    input.addEventListener('input', function () {
+        clearTimeout(timeout);
+
+        const query = this.value.trim();
+        suggestions.innerHTML = '';
+        suggestions.classList.add('d-none');
+        hideLoading();
+
+        if (query.length < 2) return;
+
+        timeout = setTimeout(() => {
+            // ❌ cancel previous request
+            if (controller) {
+                controller.abort();
+            }
+
+            controller = new AbortController();
+
+            showLoading();
+
+            fetch(
+                "{{ route('incoming-goods.api-suppliers') }}?q=" + encodeURIComponent(query),
+                { signal: controller.signal }
+            )
+            .then(res => res.json())
+            .then(data => {
+                hideLoading();
+                suggestions.innerHTML = '';
+
+                if (!data || data.length === 0) {
+                    suggestions.classList.add('d-none');
+                    return;
+                }
+
+                data.forEach(name => {
+                    const a = document.createElement('a');
+                    a.href = '#';
+                    a.className = 'list-group-item list-group-item-action';
+                    a.textContent = name;
+
+                    a.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        input.value = name;
+                        suggestions.innerHTML = '';
+                        suggestions.classList.add('d-none');
+                    });
+
+                    suggestions.appendChild(a);
+                });
+
+                suggestions.classList.remove('d-none');
+            })
+            .catch(err => {
+                // Ignore abort errors
+                if (err.name !== 'AbortError') {
+                    console.error(err);
+                }
+                hideLoading();
+            });
+        }, 200);
+    });
+
+    document.addEventListener('click', function (ev) {
+        if (!input.contains(ev.target) && !suggestions.contains(ev.target)) {
+            suggestions.innerHTML = '';
+            suggestions.classList.add('d-none');
+            hideLoading();
+        }
+    });
 });
 </script>
+
+
+
 
 @endsection
 
