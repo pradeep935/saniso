@@ -79,16 +79,18 @@ class SendSupplierOrderPdfAfterOrderCompleted implements ShouldQueue
             $message
                 ->to($toEmail)
                 ->subject('New Supplier Order - ' . $order->code)
-                ->setBody(nl2br($emailBody), 'text/html')
+                ->html(nl2br($emailBody))
                 ->attachData(
                     $pdf->output(),
                     'supplier_order_' . $order->code . '.pdf',
                     ['mime' => 'application/pdf']
                 );
 
+            // CC only when vendor exists
             if ($supplierEmail) {
                 $message->cc('order@saniso.nl');
             }
         });
+
     }
 }
