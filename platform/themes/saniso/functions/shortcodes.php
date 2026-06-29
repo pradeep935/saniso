@@ -18,6 +18,7 @@ use Botble\Theme\Facades\Theme;
 use Botble\Theme\Supports\ThemeSupport;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Theme\Farmart\Supports\Wishlist;
 
@@ -106,98 +107,109 @@ app()->booted(function (): void {
                 $displayType = $shortcode->display_type ?: 'featured';
                 $categoryIds = $shortcode->category_ids ? array_filter(array_map('trim', explode(',', $shortcode->category_ids))) : [];
 
-                $categories = collect();
-                
-                try {
-                    switch ($displayType) {
-                        case 'top_sale':
-                            // Categories with most sales - simplified approach
-                            $categories = ProductCategory::query()
-                                ->where('status', 'published')
-                                ->whereHas('products', function($query) {
-                                    $query->whereHas('orderProducts', function($subQuery) {
-                                        $subQuery->whereHas('order', function($orderQuery) {
-                                            $orderQuery->where('status', 'completed');
-                                        });
-                                    });
-                                })
-                                ->withCount(['products as products_count'])
-                                ->orderBy('products_count', 'desc')
-                                ->limit($limit)
-                                ->get();
-                            break;
-                            
-                        case 'top_product':
-                            // Categories with most products
-                            $categories = ProductCategory::query()
-                                ->where('status', 'published')
-                                ->withCount(['products' => function($query) {
-                                    $query->where('status', 'published');
-                                }])
-                                ->having('products_count', '>', 0)
-                                ->orderBy('products_count', 'desc')
-                                ->limit($limit)
-                                ->get();
-                            break;
-                            
-                        case 'new_added':
-                            // Recently added categories
-                            $categories = ProductCategory::query()
-                                ->where('status', 'published')
-                                ->whereHas('products', function($query) {
-                                    $query->where('status', 'published');
-                                })
-                                ->orderBy('created_at', 'desc')
-                                ->limit($limit)
-                                ->get();
-                            break;
-                            
-                        case 'custom':
-                            // Custom selected categories
-                            if (!empty($categoryIds)) {
+                $cacheKey = sprintf(
+                    'saniso_shortcode_featured_product_categories_%s_%s_%s_%s',
+                    app()->getLocale(),
+                    $displayType,
+                    $limit,
+                    md5(implode(',', $categoryIds))
+                );
+
+                $categories = Cache::remember($cacheKey, 1800, function () use ($displayType, $limit, $categoryIds) {
+                    $categories = collect();
+
+                    try {
+                        switch ($displayType) {
+                            case 'top_sale':
+                                // Categories with most sales - simplified approach
                                 $categories = ProductCategory::query()
                                     ->where('status', 'published')
-                                    ->whereIn('id', $categoryIds)
-                                    ->orderByRaw('FIELD(id, ' . implode(',', array_map('intval', $categoryIds)) . ')')
+                                    ->whereHas('products', function($query) {
+                                        $query->whereHas('orderProducts', function($subQuery) {
+                                            $subQuery->whereHas('order', function($orderQuery) {
+                                                $orderQuery->where('status', 'completed');
+                                            });
+                                        });
+                                    })
+                                    ->withCount(['products as products_count'])
+                                    ->orderBy('products_count', 'desc')
                                     ->limit($limit)
                                     ->get();
-                            }
-                            break;
-                            
-                        default:
-                            // Featured categories (default)
+                                break;
+
+                            case 'top_product':
+                                // Categories with most products
+                                $categories = ProductCategory::query()
+                                    ->where('status', 'published')
+                                    ->withCount(['products' => function($query) {
+                                        $query->where('status', 'published');
+                                    }])
+                                    ->having('products_count', '>', 0)
+                                    ->orderBy('products_count', 'desc')
+                                    ->limit($limit)
+                                    ->get();
+                                break;
+
+                            case 'new_added':
+                                // Recently added categories
+                                $categories = ProductCategory::query()
+                                    ->where('status', 'published')
+                                    ->whereHas('products', function($query) {
+                                        $query->where('status', 'published');
+                                    })
+                                    ->orderBy('created_at', 'desc')
+                                    ->limit($limit)
+                                    ->get();
+                                break;
+
+                            case 'custom':
+                                // Custom selected categories
+                                if (!empty($categoryIds)) {
+                                    $categories = ProductCategory::query()
+                                        ->where('status', 'published')
+                                        ->whereIn('id', $categoryIds)
+                                        ->orderByRaw('FIELD(id, ' . implode(',', array_map('intval', $categoryIds)) . ')')
+                                        ->limit($limit)
+                                        ->get();
+                                }
+                                break;
+
+                            default:
+                                // Featured categories (default)
+                                $categories = ProductCategory::query()
+                                    ->where('status', 'published')
+                                    ->where('is_featured', 1)
+                                    ->limit($limit)
+                                    ->get();
+                                break;
+                        }
+
+                        // If no categories found, fallback to featured categories
+                        if ($categories->isEmpty() && $displayType !== 'featured') {
                             $categories = ProductCategory::query()
                                 ->where('status', 'published')
                                 ->where('is_featured', 1)
                                 ->limit($limit)
                                 ->get();
-                            break;
-                    }
+                        }
 
-                    // If no categories found, fallback to featured categories
-                    if ($categories->isEmpty() && $displayType !== 'featured') {
+                        // Add URL attribute for each category if not present
+                        $categories->each(function ($category) {
+                            if (!isset($category->url)) {
+                                $category->url = $category->slug;
+                            }
+                        });
+                    } catch (\Exception $e) {
+                        // Final fallback
                         $categories = ProductCategory::query()
                             ->where('status', 'published')
                             ->where('is_featured', 1)
                             ->limit($limit)
                             ->get();
                     }
-                    
-                    // Add URL attribute for each category if not present
-                    $categories->each(function ($category) {
-                        if (!isset($category->url)) {
-                            $category->url = $category->slug;
-                        }
-                    });
-                    
-                } catch (\Exception $e) {
-                    // Final fallback
-                    $categories = ProductCategory::query()
-                        ->where('status', 'published')
-                        ->where('is_featured', 1)
-                        ->limit($limit)
-                        ->get();
-                }
+
+                    return $categories;
+                });
 
                 if ($categories->isEmpty()) {
                     return null;
@@ -686,31 +698,46 @@ app()->booted(function (): void {
             __('Product category products'),
             __('Product category products'),
             function (Shortcode $shortcode) {
-                $category = ProductCategory::query()
-                    ->wherePublished()
-                    ->where('id', (int) $shortcode->category_id)
-                    ->with([
-                        'activeChildren' => function (HasMany $query) {
-                            return $query->limit(3);
-                        },
-                    ])
-                    ->first();
+                $limit = (int) $shortcode->limit ?: 8;
+                $categoryId = (int) $shortcode->category_id;
+                $cacheKey = sprintf(
+                    'saniso_shortcode_product_category_products_%s_%s_%s',
+                    app()->getLocale(),
+                    $categoryId,
+                    $limit
+                );
+
+                [$category, $products] = Cache::remember($cacheKey, 1800, function () use ($categoryId, $limit) {
+                    $category = ProductCategory::query()
+                        ->wherePublished()
+                        ->where('id', $categoryId)
+                        ->with([
+                            'activeChildren' => function (HasMany $query) {
+                                return $query->limit(3);
+                            },
+                        ])
+                        ->first();
+
+                    if (! $category) {
+                        return [null, collect()];
+                    }
+
+                    $categoryIds = ProductCategory::getChildrenIds($category->activeChildren, [$category->id]);
+
+                    $products = app(ProductInterface::class)->getProductsByCategories(array_merge([
+                        'categories' => [
+                            'by' => 'id',
+                            'value_in' => $categoryIds,
+                        ],
+                        'take' => $limit,
+                    ], EcommerceHelper::withReviewsParams()));
+
+                    return [$category, $products];
+                });
 
                 if (! $category) {
                     return null;
                 }
-
-                $limit = (int) $shortcode->limit ?: 8;
-
-                $categoryIds = ProductCategory::getChildrenIds($category->activeChildren, [$category->id]);
-
-                $products = app(ProductInterface::class)->getProductsByCategories(array_merge([
-                    'categories' => [
-                        'by' => 'id',
-                        'value_in' => $categoryIds,
-                    ],
-                    'take' => $limit,
-                ], EcommerceHelper::withReviewsParams()));
 
                 if ($products->isEmpty()) {
                     return null;
@@ -908,10 +935,16 @@ app()->booted(function (): void {
         add_shortcode('featured-products', __('Featured products'), __('Featured products'), function (Shortcode $shortcode) {
             $limit = (int) $shortcode->limit ?: 10;
 
-            $products = get_featured_products([
-                'take' => $limit,
-                'with' => EcommerceHelper::withProductEagerLoadingRelations(),
-            ] + EcommerceHelper::withReviewsParams());
+            $products = Cache::remember(
+                sprintf('saniso_shortcode_featured_products_%s_%s', app()->getLocale(), $limit),
+                1800,
+                function () use ($limit) {
+                    return get_featured_products([
+                        'take' => $limit,
+                        'with' => EcommerceHelper::withProductEagerLoadingRelations(),
+                    ] + EcommerceHelper::withReviewsParams());
+                }
+            );
 
             if ($products->isEmpty()) {
                 return null;

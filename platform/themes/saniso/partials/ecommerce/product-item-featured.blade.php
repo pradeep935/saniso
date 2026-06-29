@@ -28,6 +28,8 @@
                 data-src="{{ RvMedia::getImageUrl($product->image, 'small', false, RvMedia::getDefaultImage()) }}"
                 src="{{ image_placeholder($product->image, 'small') }}"
                 alt="{{ $product->name }}"
+                loading="lazy"
+                decoding="async"
             >
         </div>
         @if ($showLabels)

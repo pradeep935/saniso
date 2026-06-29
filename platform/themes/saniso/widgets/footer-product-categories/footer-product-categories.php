@@ -3,6 +3,7 @@
 use Botble\Ecommerce\Facades\ProductCategoryHelper;
 use Botble\Ecommerce\Models\ProductCategory;
 use Botble\Widget\AbstractWidget;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Collection;
 
 class FooterProductCategoriesWidget extends AbstractWidget
@@ -41,9 +42,18 @@ class FooterProductCategoriesWidget extends AbstractWidget
         $limit = (int) $this->getConfig('limit', 10);
         $displayType = $this->getConfig('display_type', 'top_sale');
         $customCategoryIds = $this->getConfig('category_ids', []);
-        
+
+        $cacheKey = sprintf(
+            'saniso_footer_product_categories_%s_%s_%s_%s',
+            app()->getLocale(),
+            $displayType,
+            $limit,
+            md5(json_encode($customCategoryIds))
+        );
+
+        $categories = Cache::remember($cacheKey, 1800, function () use ($displayType, $limit, $customCategoryIds) {
         $categories = collect();
-        
+
         try {
             // Use ProductCategoryHelper for proper language support
             switch ($displayType) {
@@ -112,6 +122,9 @@ class FooterProductCategoriesWidget extends AbstractWidget
             // Final fallback with language support
             $categories = ProductCategoryHelper::getProductCategoriesWithUrl([], ['is_featured' => true], $limit);
         }
+
+            return $categories;
+        });
 
         return [
             'categories' => $categories,

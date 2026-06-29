@@ -279,6 +279,32 @@ class BranchInventoryController extends BaseController
 
         return response()->json(['success' => true, 'inventory' => $bi]);
     }
+
+    public function checkAvailability(Request $request)
+    {
+        $branchId = $request->branch_id;
+        $items = $request->items;
+
+        $availability = [];
+
+        foreach ($items as $item) {
+            $inventory = BranchInventory::where([
+                'branch_id' => $branchId,
+                'product_id' => $item['product_id'],
+            ])->first();
+
+            $availability[] = [
+                'product_id' => $item['product_id'],
+                'requested_quantity' => $item['quantity'],
+                'available_quantity' => $inventory ? $inventory->quantity_available : 0,
+                'can_fulfill' => $inventory && $inventory->quantity_available >= $item['quantity'],
+                'price' => $inventory ? $inventory->effective_price : null,
+            ];
+        }
+
+        return response()->json($availability);
+    }
+
     /**
      * Simple inventory management page - Optimized for 11K+ products
      * Loads all published products with selected branch inventory attached

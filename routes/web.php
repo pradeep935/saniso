@@ -1,11 +1,10 @@
 <?php
 
+use App\Http\Controllers\OfflineController;
 use Illuminate\Support\Facades\Route;
 
 // Offline page route used by service worker and fallback
-Route::get('/offline', function () {
-	return response()->view('offline');
-});
+Route::get('/offline', OfflineController::class);
 
 // Admin routes for duplicate products
 Route::group(['prefix' => 'admin', 'middleware' => ['web', 'auth']], function () {
@@ -16,4 +15,3 @@ Route::group(['prefix' => 'admin', 'middleware' => ['web', 'auth']], function ()
     Route::post('/duplicate-products/bulk-remove', [App\Http\Controllers\Admin\DuplicateProductController::class, 'bulkRemove'])
         ->name('admin.duplicate-products.bulk-remove');
 });
-

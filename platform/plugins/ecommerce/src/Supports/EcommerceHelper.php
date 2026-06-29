@@ -16,6 +16,7 @@ use Botble\Ecommerce\Enums\ProductTypeEnum;
 use Botble\Ecommerce\Facades\Cart;
 use Botble\Ecommerce\Facades\ProductCategoryHelper;
 use Botble\Ecommerce\Forms\ProductForm;
+use Botble\Ecommerce\Http\Controllers\FallbackRouteController;
 use Botble\Ecommerce\Models\Brand;
 use Botble\Ecommerce\Models\Customer;
 use Botble\Ecommerce\Models\Product;
@@ -1749,13 +1750,9 @@ class EcommerceHelper
     {
         return AdminHelper::registerRoutes(function () use ($prefix): void {
             Route::group(['prefix' => $prefix, 'as' => 'fallback-routes.'], function () use ($prefix): void {
-                Route::any('{route?}', function (?string $route = null) use ($prefix) {
-                    $uri = $prefix . ($route ? '/' . $route : '');
-
-                    return redirect()->to(
-                        str_replace($uri, $this->getAdminPrefix() . '/' . $uri, request()->fullUrl())
-                    );
-                })->where('route', '.*');
+                Route::any('{route?}', FallbackRouteController::class)
+                    ->defaults('fallback_prefix', $prefix)
+                    ->where('route', '.*');
             });
         });
     }
