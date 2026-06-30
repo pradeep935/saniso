@@ -215,6 +215,18 @@
                             <button type="button" class="btn btn-outline-success w-100 mb-2" data-bs-toggle="modal" data-bs-target="#adjustStockModal">
                                 <i class="fas fa-plus-minus me-2"></i>Adjust Stock Quantity
                             </button>
+                            <form method="POST"
+                                  action="{{ route('branch-inventory.destroy', $branchInventory) }}"
+                                  onsubmit="return confirm('Remove this product from this branch inventory? This will not delete the product from the main catalog.');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-outline-danger w-100">
+                                    <i class="fas fa-trash-alt me-2"></i>Remove from this Branch
+                                </button>
+                            </form>
+                            <small class="d-block text-muted mt-2">
+                                Removes only this branch inventory entry. The product remains in the catalog.
+                            </small>
                         </div>
                     </div>
                 </div>

@@ -91,13 +91,35 @@
                         </div>
                     </form>
                     <div class="row g-2 mt-2 align-items-center">
-                        <div class="col-md-6"></div>
+                        <div class="col-md-4">
+                            @if($selectedBranch)
+                                <small class="text-muted">
+                                    {{ number_format($stats['missing_products'] ?? 0) }} catalog products are not linked to {{ $selectedBranch->name }}.
+                                </small>
+                            @endif
+                        </div>
                         <div class="col-md-2">
                             <button type="button" class="btn btn-primary w-100" onclick="document.querySelector('form').submit()">
                                 <i class="fas fa-search me-1"></i> Filter
                             </button>
                         </div>
-                        <!-- Add All button removed as per configuration (no mass-add) -->
+                        @if($selectedBranch)
+                        <div class="col-md-3">
+                            <button type="button" class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#addProductsToBranchModal">
+                                <i class="fas fa-list me-1"></i>
+                                Add products to branch
+                            </button>
+                        </div>
+                        <div class="col-md-3">
+                            <button type="button"
+                                    class="btn btn-outline-success w-100"
+                                    onclick="showAddMissingProductsModal()"
+                                    @if(($stats['missing_products'] ?? 0) <= 0) disabled @endif>
+                                <i class="fas fa-plus-circle me-1"></i>
+                                Add products missing from this branch
+                            </button>
+                        </div>
+                        @endif
                         @if($selectedBranch && $selectedBranch->is_main_branch)
                         <div class="col-md-2">
                             <button type="button" class="btn btn-danger w-100" onclick="restockMainBranchZero()">
@@ -110,6 +132,11 @@
             </div>
 
             @if($selectedBranch)
+                <div class="alert alert-info">
+                    <strong>Missing products</strong> means published catalog products that do not yet have an inventory row for {{ $selectedBranch->name }}.
+                    Adding them creates the branch inventory rows with quantity 0; it does not add stock.
+                </div>
+
                 @php
                     $invCollection = method_exists($inventory, 'getCollection') ? $inventory->getCollection() : ($inventory ?? collect());
                     $replenishItems = $invCollection->filter(function ($i) {
@@ -303,6 +330,127 @@
     </div>
 </div>
 
+@if($selectedBranch)
+<div class="modal fade" id="addMissingProductsModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="addMissingProductsForm">
+                @csrf
+                <div class="modal-header">
+                    <h5 class="modal-title">Add missing products to branch inventory</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-2">
+                        This will add published catalog products that are not yet linked to {{ $selectedBranch->name }}.
+                    </p>
+                    <p class="text-muted small mb-3">
+                        Missing products are products that exist in the main product catalog, but do not have an inventory row for this branch yet.
+                    </p>
+                    <div class="alert alert-warning py-2">
+                        {{ number_format($stats['missing_products'] ?? 0) }} products will be added to this branch inventory.
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Default Quantity</label>
+                        <input type="number" name="default_quantity" id="missingProductsDefaultQuantity" class="form-control" value="0" min="0" max="999999" required>
+                        <small class="text-muted">Use 0 if you only want to create the branch inventory rows without adding stock.</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Add Products</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endif
+
+@if($selectedBranch)
+<div class="modal fade" id="addProductsToBranchModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="addProductsToBranchForm">
+                @csrf
+                <input type="hidden" name="branch_id" value="{{ $selectedBranch->id }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add products to {{ $selectedBranch->name }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Add Method</label>
+                        <select name="mode" id="addProductsMode" class="form-select" required>
+                            <option value="single">Single product</option>
+                            <option value="category">Products from category</option>
+                            <option value="branch">Products from another branch</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3 add-products-mode-field" data-mode-field="single">
+                        <label class="form-label">Product ID, SKU, barcode, or name</label>
+                        <input type="text" name="product_lookup" class="form-control" placeholder="e.g. SKU-P001303 or Hammer stapler">
+                    </div>
+
+                    <div class="mb-3 add-products-mode-field d-none" data-mode-field="category">
+                        <label class="form-label">Category</label>
+                        <select name="category_id" class="form-select">
+                            <option value="">Select category</option>
+                            @foreach($categories as $category)
+                                <option value="{{ $category->id }}">{{ $category->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="mb-3 add-products-mode-field d-none" data-mode-field="branch">
+                        <label class="form-label">Source Branch</label>
+                        <select name="source_branch_id" class="form-select">
+                            <option value="">Select source branch</option>
+                            @foreach($branches as $branch)
+                                @if($branch->id !== $selectedBranch->id)
+                                    <option value="{{ $branch->id }}">{{ $branch->name }}</option>
+                                @endif
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="mb-3 add-products-batch-field d-none">
+                        <label class="form-label">Number of products to add</label>
+                        <select name="limit" class="form-select">
+                            <option value="10">10 products</option>
+                            <option value="50">50 products</option>
+                            <option value="100">100 products</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3 add-products-mode-field d-none" data-mode-field="branch">
+                        <label class="form-label">Quantity Source</label>
+                        <select name="quantity_source" class="form-select">
+                            <option value="default">Use default quantity below</option>
+                            <option value="source_branch">Copy available quantity from source branch</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Default Quantity</label>
+                        <input type="number" name="default_quantity" class="form-control" value="0" min="0" max="999999" required>
+                        <small class="text-muted">Products already in {{ $selectedBranch->name }} will be skipped.</small>
+                    </div>
+
+                    <div class="alert alert-info py-2 mb-0">
+                        This adds products to branch inventory only. It does not create new catalog products.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Products</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endif
+
 <!-- Loading Overlay -->
 <div id="loadingOverlay" class="loading-overlay-hidden">
     <div class="loading-content">
@@ -349,7 +497,59 @@ $(document).ready(function() {
         
         addProductToBranch(productId, branchId, 100);
     });
+
+    $('#addMissingProductsForm').on('submit', function(e) {
+        e.preventDefault();
+        addMissingProductsToBranch($('#missingProductsDefaultQuantity').val());
+    });
+
+    $('#addProductsMode').on('change', updateAddProductsMode);
+    updateAddProductsMode();
+
+    $('#addProductsToBranchForm').on('submit', function(e) {
+        e.preventDefault();
+        addSelectedProductsToBranch($(this));
+    });
 });
+
+function updateAddProductsMode() {
+    const mode = $('#addProductsMode').val();
+
+    $('.add-products-mode-field').addClass('d-none');
+    $(`.add-products-mode-field[data-mode-field="${mode}"]`).removeClass('d-none');
+    $('.add-products-batch-field').toggleClass('d-none', mode === 'single');
+}
+
+function addSelectedProductsToBranch(form) {
+    $('#loadingOverlay').show();
+
+    $.ajax({
+        url: '{{ route("branch-inventory.add-selected-products") }}',
+        method: 'POST',
+        data: form.serialize(),
+        success: function(response) {
+            if (response.success) {
+                $('#addProductsToBranchModal').modal('hide');
+                showNotification(response.message, response.added_count > 0 ? 'success' : 'error');
+                setTimeout(() => window.location.reload(), 1500);
+            } else {
+                showNotification('Failed to add products: ' + (response.message || 'Unknown error'), 'error');
+            }
+        },
+        error: function(xhr) {
+            let message = xhr.responseJSON?.message || 'Unknown error';
+
+            if (xhr.responseJSON?.errors) {
+                message = Object.values(xhr.responseJSON.errors).flat().join(', ');
+            }
+
+            showNotification('Error: ' + message, 'error');
+        },
+        complete: function() {
+            $('#loadingOverlay').hide();
+        }
+    });
+}
 
 function updateQuantity(input, inventoryId, quantity) {
     if (input.data('processing')) {
@@ -488,7 +688,64 @@ function addProductToBranch(productId, branchId, quantity) {
     });
 }
 
-// addAllProductsToBranch removed — mass add disabled per requirements
+function showAddMissingProductsModal() {
+    const missingCount = {{ (int) ($stats['missing_products'] ?? 0) }};
+
+    if (missingCount <= 0) {
+        showNotification('No missing products for this branch.', 'success');
+        return;
+    }
+
+    $('#addMissingProductsModal').modal('show');
+}
+
+// Adds catalog products that do not yet have inventory rows for the selected branch.
+function addMissingProductsToBranch(defaultQuantity) {
+    const branchId = {{ $selectedBranch ? $selectedBranch->id : 'null' }};
+    const missingCount = {{ (int) ($stats['missing_products'] ?? 0) }};
+    const quantity = parseInt(defaultQuantity, 10);
+
+    if (!branchId) {
+        alert('Please select a branch first');
+        return;
+    }
+
+    if (missingCount <= 0) {
+        showNotification('No missing products for this branch.', 'success');
+        return;
+    }
+
+    if (Number.isNaN(quantity) || quantity < 0) {
+        showNotification('Please enter a valid default quantity.', 'error');
+        return;
+    }
+
+    $('#loadingOverlay').show();
+
+    $.ajax({
+        url: '{{ $selectedBranch ? route("branch-inventory.add-all-products", $selectedBranch->id) : "#" }}',
+        method: 'POST',
+        data: {
+            default_quantity: quantity,
+            _token: '{{ csrf_token() }}'
+        },
+        success: function(response) {
+            if (response.success) {
+                $('#addMissingProductsModal').modal('hide');
+                showNotification(response.message, 'success');
+                setTimeout(() => window.location.reload(), 1500);
+            } else {
+                showNotification('Failed to add missing products: ' + (response.message || 'Unknown error'), 'error');
+            }
+        },
+        error: function(xhr) {
+            showNotification('Error: ' + (xhr.responseJSON?.message || 'Unknown error'), 'error');
+        },
+        complete: function() {
+            $('#loadingOverlay').hide();
+        }
+    });
+}
 
 function restockZeroQuantity() {
     const branchId = {{ $selectedBranch ? $selectedBranch->id : 'null' }};

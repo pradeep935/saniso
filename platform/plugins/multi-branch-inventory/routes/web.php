@@ -37,6 +37,7 @@ AdminHelper::registerRoutes(function () {
         Route::get('/{branchInventory}/edit', [\Botble\MultiBranchInventory\Http\Controllers\BranchInventoryController::class, 'edit'])->name('edit');
         Route::get('/{id}/details', [\Botble\MultiBranchInventory\Http\Controllers\BranchInventoryController::class, 'getDetails'])->name('details');
         Route::put('/{branchInventory}', [\Botble\MultiBranchInventory\Http\Controllers\BranchInventoryController::class, 'update'])->name('update');
+        Route::delete('/{branchInventory}', [\Botble\MultiBranchInventory\Http\Controllers\BranchInventoryController::class, 'destroy'])->name('destroy');
         Route::post('/{branchInventory}/adjust-stock', [\Botble\MultiBranchInventory\Http\Controllers\BranchInventoryController::class, 'adjustStock'])->name('adjust-stock');
         
         // AJAX endpoints for simple inventory management
@@ -45,6 +46,7 @@ AdminHelper::registerRoutes(function () {
         
         // Add product to branch inventory
         Route::post('/add-product-to-branch', [\Botble\MultiBranchInventory\Http\Controllers\BranchInventoryController::class, 'addProductToBranchInventory'])->name('add-product-to-branch');
+        Route::post('/add-selected-products', [\Botble\MultiBranchInventory\Http\Controllers\BranchInventoryController::class, 'addSelectedProductsToBranch'])->name('add-selected-products');
         
         // New simple inventory management
         Route::post('/add-all-products/{branch_id}', [\Botble\MultiBranchInventory\Http\Controllers\BranchInventoryController::class, 'addAllProductsToBranch'])->name('add-all-products');

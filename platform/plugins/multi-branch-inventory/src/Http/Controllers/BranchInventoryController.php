@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Botble\MultiBranchInventory\Models\Branch;
 use Botble\MultiBranchInventory\Models\BranchInventory;
 use Botble\Ecommerce\Models\Product;
+use Botble\Ecommerce\Models\ProductCategory;
 use DB;
 
 class BranchInventoryController extends BaseController
@@ -153,6 +154,50 @@ class BranchInventoryController extends BaseController
 
         flash()->success('Branch inventory updated successfully');
         return redirect()->back();
+    }
+
+    /**
+     * Remove a product from a branch inventory without deleting the catalog product.
+     */
+    public function destroy($branchInventory)
+    {
+        if ($branchInventory instanceof BranchInventory) {
+            $bi = $branchInventory;
+        } else {
+            $bi = BranchInventory::findOrFail($branchInventory);
+        }
+
+        $productName = $bi->product->name ?? 'Product';
+        $branchName = $bi->branch->name ?? 'branch';
+        $branchId = $bi->branch_id;
+
+        if ((int) $bi->quantity_reserved > 0) {
+            $message = "Cannot remove '{$productName}' from {$branchName} because it has reserved stock.";
+
+            if (request()->expectsJson() || request()->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $message,
+                ], 422);
+            }
+
+            return back()->withErrors(['error' => $message]);
+        }
+
+        $bi->delete();
+
+        $message = "'{$productName}' removed from {$branchName} inventory.";
+
+        if (request()->expectsJson() || request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+            ]);
+        }
+
+        flash()->success($message);
+
+        return redirect()->route('branch-inventory.index', ['branch_id' => $branchId]);
     }
 
     /**
@@ -399,10 +444,17 @@ class BranchInventoryController extends BaseController
             // Rebuild inventory variable to use reordered collection
             $inventory = $products;
 
+            $catalogProductCount = Product::where('status', 'published')->count();
+            $productsInSelectedBranch = BranchInventory::where('branch_id', $selectedBranch->id)
+                ->distinct('product_id')
+                ->count('product_id');
+
             // Calculate summary statistics
             $stats = [
                 'total_products' => $products->total(),
-                'total_in_inventory' => BranchInventory::where('branch_id', $selectedBranch->id)->count(),
+                'catalog_total_products' => $catalogProductCount,
+                'total_in_inventory' => $productsInSelectedBranch,
+                'missing_products' => max($catalogProductCount - $productsInSelectedBranch, 0),
                 'low_stock_items' => BranchInventory::where('branch_id', $selectedBranch->id)->whereRaw('quantity_available <= minimum_stock')->count(),
                 'out_of_stock' => BranchInventory::where('branch_id', $selectedBranch->id)->where('quantity_available', '<=', 0)->count(),
                 'replenishment_requests' => BranchInventory::where('branch_id', $selectedBranch->id)->where('needs_replenishment', true)->count(),
@@ -413,15 +465,22 @@ class BranchInventoryController extends BaseController
             $inventory = collect([]);
             $stats = [
                 'total_products' => 0,
+                'catalog_total_products' => 0,
                 'total_in_inventory' => 0,
+                'missing_products' => 0,
                 'low_stock_items' => 0,
                 'out_of_stock' => 0,
                 'total_value' => 0,
             ];
         }
 
+        $categories = ProductCategory::query()
+            ->where('status', 'published')
+            ->orderBy('name')
+            ->get(['id', 'name']);
+
         return view('plugins/multi-branch-inventory::branch-inventory.inventory-index', compact(
-            'inventory', 'branches', 'selectedBranch', 'stats'
+            'inventory', 'branches', 'selectedBranch', 'stats', 'categories'
         ));
     }
 
@@ -620,6 +679,126 @@ class BranchInventoryController extends BaseController
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to update quantity: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Add all products to a branch with default quantity
+     */
+    public function addSelectedProductsToBranch(Request $request)
+    {
+        $validated = $request->validate([
+            'branch_id' => 'required|exists:mbi_branches,id',
+            'mode' => 'required|in:single,category,branch',
+            'product_lookup' => 'required_if:mode,single|nullable|string|max:255',
+            'category_id' => 'required_if:mode,category|nullable|exists:ec_product_categories,id',
+            'source_branch_id' => 'required_if:mode,branch|nullable|exists:mbi_branches,id|different:branch_id',
+            'limit' => 'required|integer|in:1,10,50,100',
+            'default_quantity' => 'required|integer|min:0|max:999999',
+            'quantity_source' => 'nullable|in:default,source_branch',
+        ]);
+
+        try {
+            $branch = Branch::findOrFail($validated['branch_id']);
+            $limit = $validated['mode'] === 'single' ? 1 : (int) $validated['limit'];
+            $defaultQuantity = (int) $validated['default_quantity'];
+            $sourceBranchId = $validated['source_branch_id'] ?? null;
+            $copySourceQuantity = $validated['mode'] === 'branch'
+                && ($validated['quantity_source'] ?? 'default') === 'source_branch';
+
+            $query = Product::query()
+                ->where('status', 'published')
+                ->whereDoesntHave('branchInventories', function ($query) use ($branch) {
+                    $query->where('branch_id', $branch->id);
+                });
+
+            if ($validated['mode'] === 'single') {
+                $lookup = trim((string) $validated['product_lookup']);
+
+                $query->where(function ($query) use ($lookup) {
+                    if (is_numeric($lookup)) {
+                        $query->where('id', (int) $lookup);
+                    }
+
+                    $query->orWhere('sku', $lookup)
+                        ->orWhere('barcode', $lookup)
+                        ->orWhere('name', 'like', '%' . $lookup . '%');
+                });
+            }
+
+            if ($validated['mode'] === 'category') {
+                $category = ProductCategory::query()
+                    ->with('activeChildren')
+                    ->findOrFail($validated['category_id']);
+                $categoryIds = ProductCategory::getChildrenIds($category->activeChildren, [$category->id]);
+
+                $query->whereHas('categories', function ($query) use ($categoryIds) {
+                    $query->whereIn('ec_product_categories.id', $categoryIds);
+                });
+            }
+
+            if ($validated['mode'] === 'branch') {
+                $query->whereHas('branchInventories', function ($query) use ($sourceBranchId) {
+                    $query->where('branch_id', $sourceBranchId);
+                });
+            }
+
+            $products = $query
+                ->orderBy('name')
+                ->limit($limit)
+                ->get();
+
+            $sourceInventories = collect();
+
+            if ($copySourceQuantity && $sourceBranchId) {
+                $sourceInventories = BranchInventory::query()
+                    ->where('branch_id', $sourceBranchId)
+                    ->whereIn('product_id', $products->pluck('id'))
+                    ->get()
+                    ->keyBy('product_id');
+            }
+
+            $addedCount = 0;
+
+            DB::transaction(function () use ($products, $branch, $defaultQuantity, $sourceInventories, &$addedCount) {
+                foreach ($products as $product) {
+                    $sourceInventory = $sourceInventories->get($product->id);
+                    $quantity = $sourceInventory ? (int) $sourceInventory->quantity_available : $defaultQuantity;
+
+                    BranchInventory::create([
+                        'branch_id' => $branch->id,
+                        'product_id' => $product->id,
+                        'sku' => $product->sku,
+                        'quantity_on_hand' => $quantity,
+                        'quantity_available' => $quantity,
+                        'quantity_reserved' => 0,
+                        'minimum_stock' => 0,
+                        'cost_price' => $product->cost_per_item ?? 0,
+                        'selling_price' => $product->price ?? 0,
+                        'visible_online' => true,
+                        'visible_in_pos' => false,
+                        'only_visible_in_pos' => false,
+                    ]);
+
+                    $this->syncMainProductQuantity($product->id);
+                    $addedCount++;
+                }
+            });
+
+            $message = $addedCount > 0
+                ? "Added {$addedCount} product(s) to {$branch->name} inventory."
+                : "No new products were added. Matching products may already exist in {$branch->name}.";
+
+            return response()->json([
+                'success' => true,
+                'added_count' => $addedCount,
+                'message' => $message,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to add products: ' . $e->getMessage(),
             ], 500);
         }
     }
